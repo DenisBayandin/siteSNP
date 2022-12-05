@@ -8,4 +8,5 @@ urlpatterns = [
     path('register/', RegisterUser.as_view(), name = 'register'),
     path('accounts/profile/', profile, name = 'profile'),
     path('logout/', logout_view, name = 'logout'),
+    path('__debug__/', include('debug_toolbar.urls')),
 ]

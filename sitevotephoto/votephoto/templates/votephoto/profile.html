@@ -3,14 +3,22 @@
 
 {% block content %}
     {% csrf_token %}
-    {% if request.user.is_authenticated %}
-        <div class="h1"> Имя вашего профиля: {{user.username}} </div>
-        <div> ФИО: {{user.fio}}</div>
-    {% else %}
-        <h1> Вы не авторизованы, войдите в профиль. </h1>
-        <br>
-        <div><a class="h4 text-dark text-decoration-none" href="{% url 'login' %}">  Нажмите, если хотите войти в   профиль </a></div>
-        <br>
-        <div><a class="h4 text-dark text-decoration-none" href="{% url 'register' %}">  Нажмите, если хотите пройти регистрацию </a></div>
-    {% endif %}
+<!--    {% if request.user.is_authenticated %}-->
+<!--        <br>-->
+<!--        <div class="h3"> Имя вашего профиля: {{user.username}} </div>-->
+<!--        <br>-->
+<!--        <div class="h5"> ФИО: {{user.fio}}</div>-->
+<!--    {% else %}-->
+<!--        <h1> Вы не авторизованы, войдите в профиль. </h1>-->
+<!--        <br>-->
+<!--        <div><a class="h4 text-dark text-decoration-none" href="{% url 'login' %}">  Нажмите, если хотите войти в   профиль </a></div>-->
+<!--        <br>-->
+<!--        <div><a class="h4 text-dark text-decoration-none" href="{% url 'register' %}">  Нажмите, если хотите пройти регистрацию </a></div>-->
+<!--    {% endif %}-->
+<!--        {% for atr in get_atribute_user %}-->
+<!--        <div class="h3">{{atr}}</div>-->
+<!--        {% endfor %}-->
+
+        <h1>{{AtributeUser}}</h1>
+        <h1>{{user.username}}</h1>
 {% endblock %}

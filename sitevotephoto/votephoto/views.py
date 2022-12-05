@@ -1,11 +1,12 @@
 from django.contrib.auth import logout, login
 from django.contrib.auth.views import LoginView
-from django.http import HttpResponse, request
+from django.db.transaction import commit
+from django.http import HttpResponse, request, HttpResponseRedirect
 from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView
 
-from .forms import RegisterUsersForm, LoginUsersForm
+from .forms import LoginUsersForm, RegisterUsersForm
 from .models import User
 
 
@@ -25,7 +26,19 @@ def logout_view(request):
     return redirect('main')
 
 
+# def RegisterUser(request):
+#     form = RegisterUsersForm
+#     # return render(request, 'votephoto/register.html', {'form': form})
+#     if request.method == 'POST':
+#         form = RegisterUsersForm(request.POST)
+#         form.save()
+#         return HttpResponseRedirect(reverse('main'))
+#     else:
+#         return render(request, 'votephoto/register.html', {'form': form})
+
+
 class RegisterUser(CreateView):
+    # breakpoint()
     form_class = RegisterUsersForm
     template_name = 'votephoto/register.html'
     success_url = reverse_lazy('login')
@@ -35,11 +48,10 @@ class RegisterUser(CreateView):
     #     context['title'] = 'Регистрация'
     #     return context
 
-    # def form_valid(self, form):
-    #     user = form.save()
-    #     login(self.request, user)
-    #     return redirect('main')
-
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+        return redirect('main')
 
 
 class LoginUser(LoginView):
