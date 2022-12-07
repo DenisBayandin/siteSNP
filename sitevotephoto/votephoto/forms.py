@@ -28,7 +28,7 @@ class LoginUsersForm(AuthenticationForm):
 
 class AddPhotoForm(forms.ModelForm):
     namePhoto = forms.CharField(max_length=150, label='Название фотографии', widget=forms.TextInput(attrs={'class': 'form-input'}))
-    сontentPhoto = forms.CharField(label='Описание к фотографии', widget=forms.Textarea(attrs={'cols': 60, 'rows': 10}))
+    сontentPhoto = forms.CharField(label='Описание к фотографии', widget=forms.Textarea(attrs={'cols': 80, 'rows': 5}))
     oldPhoto = forms.ImageField(label='Фотография')
     class Meta:
         model = Photo

@@ -19,8 +19,14 @@
             <div class="h5"> Вы не являетесь модером.</div>
         {% endif %}
         <br>
-        <div><a class="h5 text-dark text-decoration-none" href="{% url 'add' %}">Нажмите, если хотите добавить фотографии.</a></div>
-        <br>
+        <h5>Добавьте фотографию.</h5>
+        <form action="{% url 'profile' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-error">{{ form.non_field_errors }}</div>
+        {{ form.as_p }}
+
+        <button type="submit" class="btn btn-dark"> Сохранить </button>
+        </form>
     {% else %}
         <h1> Вы не авторизованы, войдите в профиль. </h1>
         <br>

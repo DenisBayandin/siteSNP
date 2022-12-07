@@ -16,7 +16,17 @@ def main_view(request):
     return render(request, 'votephoto/main.html', context)
 
 
-def addphotoview(request):
+# def addphotoview(request):
+#     if request.method == 'POST':
+#         form = AddPhotoForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('main')
+#     else:
+#         form = AddPhotoForm
+#     return render(request, 'votephoto/addphoto.html',{'form': form, 'title':'Добавление фотографии.'})
+
+def profile(request):
     if request.method == 'POST':
         form = AddPhotoForm(request.POST, request.FILES)
         if form.is_valid():
@@ -24,11 +34,7 @@ def addphotoview(request):
             return redirect('main')
     else:
         form = AddPhotoForm
-    return render(request, 'votephoto/addphoto.html',{'form': form, 'title':'Добавление фотографии.'})
-
-def profile(request):
-    context = {'title': "Личный кабинет"}
-    return render(request, 'votephoto/profile.html', context)
+    return render(request, 'votephoto/profile.html',{'form': form, 'title':'Личный кабинет.'})
 
 
 def logout_view(request):
