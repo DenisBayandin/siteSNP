@@ -1,7 +1,31 @@
 {% extends 'votephoto/base.html' %}
 
 
+
 {% block content %}
-<h1> Content </h1>
+
+        {% for p in photo %}
+       <div class="card mb-3">
+        <div class="card-header fs-5">
+        {{ p.namePhoto }}
+        </div>
+            <div class="card-body">
+            <div class="media">
+                <img src="{{ p.oldPhoto.url }}" style=" border: 8px solid #ffffff;" align="left" alt="{{ p.сontentPhoto }}" width="500" height="500" class="mr-3">
+                <div class="media body fs-4">
+                <p class="card-text text-end">{{ p.сontentPhoto|safe|linebreaks }}</p>
+    <!--          <a href="{{ item.get_absolute_url }}" class="btn btn-primary">Read more...</a>-->
+<!--        |truncatewords:20 - прячет слова после 20-ого слова           -->
+                </div>
+                <div class="fs-6">Автор: {{user.username}}</div>
+            </div>
+        </div>
+        <div class="card-footer text-muted">
+            {{ p.dateCreatePhoto}}
+        </div>
+        </div>
+        {% empty %}
+          <h4>Новостей нет!</h4>
+        {% endfor %}
 
 {% endblock %}

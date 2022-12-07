@@ -3,6 +3,7 @@ from django import forms
 import os
 
 from django.core.exceptions import ValidationError
+from easy_thumbnails.files import get_thumbnailer
 
 from .models import User, Photo
 
@@ -44,5 +45,9 @@ class AddPhotoForm(forms.ModelForm):
                 return file
             else:
                 raise ValidationError("Вы сохранили файл не с jpg расширением, нам нужно '.jpg'")
+
+
+
+
 
 

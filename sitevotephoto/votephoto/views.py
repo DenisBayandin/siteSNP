@@ -11,8 +11,8 @@ from .models import User
 
 
 def main_view(request):
-    # print(request)
-    context = {'title': "Главная страница"}
+    photos = Photo.objects.all()
+    context = {'title': "Главная страница", 'photo': photos}
     return render(request, 'votephoto/main.html', context)
 
 
@@ -30,11 +30,16 @@ def profile(request):
     if request.method == 'POST':
         form = AddPhotoForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            obj = form.save(commit=False)
+            obj.user_id = request.user
+            obj.photo_145x165 = get_thumbnailer(obj.oldPhoto)
+            obj.photo_510x510 = get_thumbnailer(obj.oldPhoto)
+            obj.photo_1680x1680 = get_thumbnailer(obj.oldPhoto)
+            obj.save()
             return redirect('main')
     else:
         form = AddPhotoForm
-    return render(request, 'votephoto/profile.html',{'form': form, 'title':'Личный кабинет.'})
+    return render(request, 'votephoto/profile.html', {'form': form, 'title': 'Личный кабинет.'})
 
 
 def logout_view(request):
