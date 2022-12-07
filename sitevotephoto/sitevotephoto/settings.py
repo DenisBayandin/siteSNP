@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'votephoto.apps.VotephotoConfig',
-    "debug_toolbar",
+    'debug_toolbar',
+    'easy_thumbnails',
 ]
 
 MIDDLEWARE = [
@@ -93,7 +94,7 @@ WSGI_APPLICATION = 'sitevotephoto.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'testOne',
+        'NAME': 'testTwo',
         'USER': 'postgres',
         'PASSWORD': 'Zxc230104',
     }

@@ -3,22 +3,29 @@
 
 {% block content %}
     {% csrf_token %}
-<!--    {% if request.user.is_authenticated %}-->
-<!--        <br>-->
-<!--        <div class="h3"> Имя вашего профиля: {{user.username}} </div>-->
-<!--        <br>-->
-<!--        <div class="h5"> ФИО: {{user.fio}}</div>-->
-<!--    {% else %}-->
-<!--        <h1> Вы не авторизованы, войдите в профиль. </h1>-->
-<!--        <br>-->
-<!--        <div><a class="h4 text-dark text-decoration-none" href="{% url 'login' %}">  Нажмите, если хотите войти в   профиль </a></div>-->
-<!--        <br>-->
-<!--        <div><a class="h4 text-dark text-decoration-none" href="{% url 'register' %}">  Нажмите, если хотите пройти регистрацию </a></div>-->
-<!--    {% endif %}-->
-<!--        {% for atr in get_atribute_user %}-->
-<!--        <div class="h3">{{atr}}</div>-->
-<!--        {% endfor %}-->
-
-        <h1>{{AtributeUser}}</h1>
-        <h1>{{user.username}}</h1>
+    {% if request.user.is_authenticated %}
+        <br>
+        <div class="h3"> Имя вашего профиля: {{user.username}} </div>
+        <br>
+        <div class="h5">Фото профиля: <p><img class="border border-dark" src="{{user.photoUser.url}}" width="500" height="500"></p></div>
+        <br>
+        <div class="h5"> ФИО: {{user.fio}}</div>
+        <br>
+        <div class="h5"> Почта: {{user.email}}</div>
+        <br>
+        {% if user.usualUserOrModer %}
+            <div class="h5"> Вы являетесь модером.</div>
+        {% else %}
+            <div class="h5"> Вы не являетесь модером.</div>
+        {% endif %}
+        <br>
+        <div><a class="h5 text-dark text-decoration-none" href="{% url 'add' %}">Нажмите, если хотите добавить фотографии.</a></div>
+        <br>
+    {% else %}
+        <h1> Вы не авторизованы, войдите в профиль. </h1>
+        <br>
+        <div><a class="h4 text-dark text-decoration-none" href="{% url 'login' %}">  Нажмите, если хотите войти в   профиль </a></div>
+        <br>
+        <div><a class="h4 text-dark text-decoration-none" href="{% url 'register' %}">  Нажмите, если хотите пройти регистрацию </a></div>
+    {% endif %}
 {% endblock %}

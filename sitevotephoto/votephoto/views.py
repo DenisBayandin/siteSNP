@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView
 
-from .forms import LoginUsersForm, RegisterUsersForm
+from .forms import *
 from .models import User
 
 
@@ -15,6 +15,16 @@ def main_view(request):
     context = {'title': "Главная страница"}
     return render(request, 'votephoto/main.html', context)
 
+
+def addphotoview(request):
+    if request.method == 'POST':
+        form = AddPhotoForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('main')
+    else:
+        form = AddPhotoForm
+    return render(request, 'votephoto/addphoto.html',{'form': form, 'title':'Добавление фотографии.'})
 
 def profile(request):
     context = {'title': "Личный кабинет"}
@@ -26,27 +36,15 @@ def logout_view(request):
     return redirect('main')
 
 
-# def RegisterUser(request):
-#     form = RegisterUsersForm
-#     # return render(request, 'votephoto/register.html', {'form': form})
-#     if request.method == 'POST':
-#         form = RegisterUsersForm(request.POST)
-#         form.save()
-#         return HttpResponseRedirect(reverse('main'))
-#     else:
-#         return render(request, 'votephoto/register.html', {'form': form})
-
-
 class RegisterUser(CreateView):
     # breakpoint()
     form_class = RegisterUsersForm
     template_name = 'votephoto/register.html'
-    success_url = reverse_lazy('login')
 
-    # def get_context_data(self, *, object_list=None, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     context['title'] = 'Регистрация'
-    #     return context
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Регистрация'
+        return context
 
     def form_valid(self, form):
         user = form.save()

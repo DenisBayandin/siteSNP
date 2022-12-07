@@ -8,7 +8,7 @@ register = template.Library()
 def get_user():
     return User.objects.all()
 
-@register.simple_tag(name = 'AtributeUser')
+@register.simple_tag()
 def get_atribute_user():
     return User._meta.fields
 
