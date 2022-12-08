@@ -5,9 +5,10 @@ from django.http import HttpResponse, request, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView
-
+import os
 from .forms import *
 from .models import User
+from PIL import Image
 
 
 def main_view(request):
@@ -32,9 +33,6 @@ def profile(request):
         if form.is_valid():
             obj = form.save(commit=False)
             obj.user_id = request.user
-            obj.photo_145x165 = get_thumbnailer(obj.oldPhoto)
-            obj.photo_510x510 = get_thumbnailer(obj.oldPhoto)
-            obj.photo_1680x1680 = get_thumbnailer(obj.oldPhoto)
             obj.save()
             return redirect('main')
     else:

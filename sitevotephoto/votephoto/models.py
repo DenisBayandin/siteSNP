@@ -1,7 +1,10 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.contrib.auth import get_user_model
 from easy_thumbnails.fields import ThumbnailerImageField
+from PIL import Image as Img
+from io import StringIO, BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
+
 
 
 class User(AbstractUser):
@@ -30,9 +33,8 @@ class Photo(models.Model):
     ModificationPhoto = models.BooleanField(default=False, verbose_name='Изменили фотографию?')
     newPhoto = models.ImageField(verbose_name='Фотография', blank=False, upload_to='photos_main/%Y/%m/%d')
     oldPhoto = models.ImageField(verbose_name='Старая фотография', blank=True, upload_to='photos_old/%Y/%m/%d')
-    photo_145x165 = ThumbnailerImageField(verbose_name="Фото размером 145x165", blank=True, upload_to='photos_145x165/%Y/%m/%d', resize_source=dict(size=(145, 165), quality=80, crop=True))
-    photo_510x510 = ThumbnailerImageField(verbose_name="Фото размером 510x510", blank=True, upload_to='photos_510x510/%Y/%m/%d', resize_source=dict(size=(510, 510), quality=80, crop=True))
-    photo_1680x1680 = ThumbnailerImageField(verbose_name="Фото размером 1680х1680", blank=True, upload_to='photos_1680x1680/%Y/%m/%d', resize_source=dict(size=(1680, 1680), quality=80, crop=True))
+    photo_145x165 = models.ImageField(verbose_name='Фотография размером 145x165', blank=True, upload_to='photos_145x165/%Y/%m/%d')
+    photo_510x510 = models.ImageField(verbose_name='Фотография размером 510x510', blank=True, upload_to='photos_510x510/%Y/%m/%d')
     user_id = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
 
     def __str__(self):
@@ -40,4 +42,25 @@ class Photo(models.Model):
     class Meta:
         verbose_name = 'Фото'
         verbose_name_plural = 'Фотографии'
+
+    def save(self, *args, **kwargs):
+        image = Img.open(BytesIO(self.oldPhoto.read()))
+        image.thumbnail((145, 165), Img.ANTIALIAS)
+        output = BytesIO()
+        image.save(output, format='JPEG', quality=75)
+        output.seek(0)
+        self.photo_145x165 = InMemoryUploadedFile(output, 'ImageField', self.oldPhoto.name, 'image/jpeg',
+                                                  output.__sizeof__(), None)
+        super(Photo, self).save(*args, **kwargs)
+
+        image = Img.open(BytesIO(self.oldPhoto.read()))
+        image.thumbnail((510, 510), Img.ANTIALIAS)
+        output = BytesIO()
+        image.save(output, format='JPEG', quality=75)
+        output.seek(0)
+        self.photo_510x510 = InMemoryUploadedFile(output, 'ImageField', self.oldPhoto.name, 'image/jpeg',
+                                                  output.__sizeof__(), None)
+        super(Photo, self).save(*args, **kwargs)
+
+
 
