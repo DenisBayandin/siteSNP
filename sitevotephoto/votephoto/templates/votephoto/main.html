@@ -1,31 +1,55 @@
 {% extends 'votephoto/base.html' %}
 
 
-
 {% block content %}
 
-        {% for p in photo %}
+    {% for p in photo %}
        <div class="card mb-3">
-        <div class="card-header fs-5">
-        {{ p.namePhoto }}
+        <div class="card-header fs-5 text-center ">
+            <a href="{{ p.get_absolute_url }}" class="text-decoration-none text-info">{{ p.namePhoto }}</a>
         </div>
             <div class="card-body">
-            <div class="media">
-                <img src="{{ p.photo_510x510.url }}" style=" border: 8px solid #ffffff;" align="left" alt="{{ p.namePhoto }}" width="510" height="510" class="mr-3">
-                <div class="media body fs-4">
-                <p class="card-text text-end">{{ p.сontentPhoto|safe|linebreaks }}</p>
-    <!--          <a href="{{ item.get_absolute_url }}" class="btn btn-primary">Read more...</a>-->
-<!--        |truncatewords:20 - прячет слова после 20-ого слова           -->
+                <div class="media">
+                    <img src="{{ p.photo_510x510.url }}" style=" border: 8px solid #ffffff;" align="left" alt="{{ p.namePhoto }}" width="510" height="510" class="mr-3">
+                    <div class="media body fs-4">
+                    <p class="card-text fw-bold">Описание к фотографии:</p><p>{{ p.сontentPhoto|safe|linebreaks|truncatewords:20 }}</p>
+                    <a href="{{ p.get_absolute_url }}" class="btn btn-dark">Узнать больше о фотографии</a>
+                    </div>
                 </div>
-                <div class="fs-6">Автор: {{user.username}}</div>
+        </div>
+        <div>
+            <form method="post" action="{% url 'addlike' p.pk %}">
+                {% csrf_token %}
+<!--                {{ like.count }}-->
+<!-- Включаем теги из votephotoTags -->
+                {% load votephotoTags %}
+<!-- Передаём getAllLikesIsPhoto id фотографии -->
+                {% getAllLikesIsPhoto p.photoID as likeOnePhoto  %}
+<!-- Передаём TrueAndFalseLikeUserPhoto id юзера и фотографии -->
+                {% TrueAndFalseLikeUserPhoto p.photoID user.pk as TrueOrFalseLike%}
+<!-- Проверяем есть ли лайк у юзера, чтобы понять какую кнопку отобразить-->
+                {% if TrueOrFalseLike %}
+                    <div class="row row-cols-auto">
+                        <div class="col"></div>
+                        <button type="submit" class="btn btn-danger col-2">Мне нравится {{ likeOnePhoto }}</button>
+                    </div>
+                {% else %}
+                    <div class="row row-cols-auto">
+                        <div class="col"></div>
+                        <button type="submit" class="btn btn-light col-2">Мне нравится {{ likeOnePhoto }}</button>
+                    </div>
+                {% endif %}
+                <br>
+            </form>
+        </div>
+            <div class="card-footer text-muted">
+                {{ p.dateCreatePhoto }}
+                <br>
+                <div> Автор: {{ p.user_id }} </div>
             </div>
         </div>
-        <div class="card-footer text-muted">
-            {{ p.dateCreatePhoto}}
-        </div>
-        </div>
-        {% empty %}
-          <h4>Новостей нет!</h4>
-        {% endfor %}
+    {% empty %}
+        <h4>Новостей нет!</h4>
+    {% endfor %}
 
 {% endblock %}

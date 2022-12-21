@@ -94,7 +94,7 @@ WSGI_APPLICATION = 'sitevotephoto.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'testTwo',
+        'NAME': 'Votephoto',
         'USER': 'postgres',
         'PASSWORD': 'Zxc230104',
     }
