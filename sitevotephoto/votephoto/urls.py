@@ -10,5 +10,5 @@ urlpatterns = [
     path('logout/', logout_view, name = 'logout'),
     path('__debug__/', include('debug_toolbar.urls')),
     path('show_photo/<int:photoID>/', showOnePhoto, name = 'show_photo'),
-    path('addlike/<int:photoID>', addlike, name='addlike'),
+    path('addlike/', addlike, name='addlike'),
 ]

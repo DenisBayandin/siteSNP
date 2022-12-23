@@ -1,8 +1,11 @@
+import json
+
 from django.contrib.auth import logout, login
 from django.contrib.auth.views import LoginView
 from django.db.transaction import commit
-from django.http import HttpResponse, request, HttpResponseRedirect, Http404
+from django.http import HttpResponse, request, HttpResponseRedirect, Http404, JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render, redirect, get_object_or_404
+from django.template.loader import render_to_string
 from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView
 from .forms import *
@@ -86,20 +89,42 @@ def logout_view(request):
     return redirect('main')
 
 
-def addlike(request, photoID):
-    if request.user.is_authenticated:
-        like = Like.objects.filter(user_id=request.user)
-        photo = get_object_or_404(Photo, pk=photoID)
+# def addlike(request, photoID):
+#     if request.user.is_authenticated:
+#         like = Like.objects.filter(user_id=request.user)
+#         photo = get_object_or_404(Photo, pk=photoID)
+#         if request.method == 'POST' and request.is_ajax():
+#             if Like.objects.filter(photo_id=photoID, user_id=request.user).exists():
+#                 one_like_user = Like.objects.get(photo_id=photoID, user_id=request.user)
+#                 one_like_user.delete()
+#                 # return redirect('main')
+#                 return JsonResponse({'countlikes': Like.objects.filter(photo_id=photo.photoID).count()})
+#             else:
+#                 like = Like()
+#                 like.user_id = request.user
+#                 like.photo_id = photo
+#                 like.save()
+#                 return JsonResponse({'countlikes': Like.objects.filter(photo_id=photo.photoID).count()})
+#                 # return redirect('main')
+#     else:
+#         return redirect('login')
+
+def addlike(request):
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    data = json.load(request)
+    photoID = data.get('photoID')
+    if is_ajax:
         if request.method == 'POST':
             if Like.objects.filter(photo_id=photoID, user_id=request.user).exists():
                 one_like_user = Like.objects.get(photo_id=photoID, user_id=request.user)
                 one_like_user.delete()
-                return redirect('main')
+                return HttpResponse(status=200)
             else:
+                photo = get_object_or_404(Photo, pk=photoID)
                 like = Like()
                 like.user_id = request.user
                 like.photo_id = photo
                 like.save()
-                return redirect('main')
+                return HttpResponse(status=201)
     else:
-        return redirect('login')
+        return HttpResponseBadRequest('Invalid request')

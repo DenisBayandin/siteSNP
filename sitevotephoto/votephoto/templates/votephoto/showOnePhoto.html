@@ -14,7 +14,7 @@
             </div>
         </div>
         <div>
-            <form method="post" action="{% url 'addlike' photo.photoID %}">
+            <form method="post" action="{% url 'addlike' %}">
                 {% csrf_token %}
 <!--                {{ like.count }}-->
 <!-- Включаем теги из votephotoTags -->
