@@ -25,26 +25,20 @@
 <!-- Передаём TrueAndFalseLikeUserPhoto id юзера и фотографии -->
                 {% TrueAndFalseLikeUserPhoto p.photoID user.pk as TrueOrFalseLike%}
 <!-- Проверяем есть ли лайк у юзера, чтобы понять какую кнопку отобразить-->
-            {% if user.is_authenticated %}
-                {% if TrueOrFalseLike %}
-                        <div class="row row-cols-auto">
-                            <div class="col"></div>
-                            <button id="LikeAndNoLike{{p.photoID}}" class="btn btn-danger col-2" onclick="addLikeAJAX({{p.photoID}})">{{ likeOnePhoto }}</button>
-                        </div>
-                    {% else %}
-                        <div class="row row-cols-auto">
-                            <div class="col"></div>
-                            <button id="LikeAndNoLike{{p.photoID}}" class="btn btn-outline-secondary col-2" onclick="addLikeAJAX({{p.photoID}})">{{ likeOnePhoto }}</button>
-                        </div>
-                    {% endif %}
-                <br>
-            {% else %}
-                 <div class="row row-cols-auto">
+            {% if TrueOrFalseLike %}
+                <div class="row row-cols-auto">
                     <div class="col"></div>
-                    <button class="btn btn-outline-secondary col-2">{{ likeOnePhoto }}</button>
-                 </div>
-                 <br>
+                        <div class="text-danger fs-5" id="TextLike{{p.photoID}}">Мне нравится:</div>
+                       <button id="LikeAndNoLike{{p.photoID}}" class="btn btn-danger col-2" onclick="addLikeAJAX({{p.photoID}})">{{ likeOnePhoto }}</button>
+                </div>
+            {% else %}
+                <div class="row row-cols-auto">
+                    <div class="col"></div>
+                        <div class="text-secondary fs-5" id="TextLike{{p.photoID}}">Мне нравится:</div>
+                        <button id="LikeAndNoLike{{p.photoID}}" class="btn btn-outline-secondary col-2" onclick="addLikeAJAX({{p.photoID}})">{{ likeOnePhoto }}</button>
+                </div>
             {% endif %}
+            <br>
         </div>
             <div class="card-footer text-muted">
                 {{ p.dateCreatePhoto }}
@@ -78,18 +72,27 @@
                 if (response.status==201){
                     console.log("AJAX WORKED ADD LIKE");
                     let page = document.querySelector('#LikeAndNoLike' + photo_id);
+                    let textLike = document.querySelector('#TextLike' + photo_id);
+                    textLike.classList.toggle('text-danger');
+                    textLike.classList.toggle('text-secondary');
                     page.classList.toggle('btn-outline-secondary');
                     page.classList.toggle('btn-danger');
                     likeCountElement.innerText = Number(likeCountElement.innerText) + 1;
                 } else if(response.status==200){
-                    console.log("AJAX WORKED");
+                    console.log("AJAX WORKED DELETE LIKE");
                     let page = document.querySelector('#LikeAndNoLike' + photo_id);
+                    let textLike = document.querySelector('#TextLike' + photo_id);
+                    textLike.classList.toggle('text-danger');
+                    textLike.classList.toggle('text-secondary');
                     page.classList.toggle('btn-outline-secondary');
                     page.classList.toggle('btn-danger');
                     if (likeCountElement.innerText != 0){
                     likeCountElement.innerText = Number(likeCountElement.innerText) - 1;
                     }
-                }  else {
+                } else if(response.status==202){
+                    console.log("AJAX WORKED REDIRECT TO LOGIN");
+                    window.location.href = {% url 'login' %};
+                } else {
                 console.log("AJAX ERROR");
                 }
             };

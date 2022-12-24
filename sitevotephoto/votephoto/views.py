@@ -110,21 +110,24 @@ def logout_view(request):
 #         return redirect('login')
 
 def addlike(request):
-    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
-    data = json.load(request)
-    photoID = data.get('photoID')
-    if is_ajax:
-        if request.method == 'POST':
-            if Like.objects.filter(photo_id=photoID, user_id=request.user).exists():
-                one_like_user = Like.objects.get(photo_id=photoID, user_id=request.user)
-                one_like_user.delete()
-                return HttpResponse(status=200)
-            else:
-                photo = get_object_or_404(Photo, pk=photoID)
-                like = Like()
-                like.user_id = request.user
-                like.photo_id = photo
-                like.save()
-                return HttpResponse(status=201)
+    if request.user.is_authenticated:
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        data = json.load(request)
+        photoID = data.get('photoID')
+        if is_ajax:
+            if request.method == 'POST':
+                if Like.objects.filter(photo_id=photoID, user_id=request.user).exists():
+                    one_like_user = Like.objects.get(photo_id=photoID, user_id=request.user)
+                    one_like_user.delete()
+                    return HttpResponse(status=200)
+                else:
+                    photo = get_object_or_404(Photo, pk=photoID)
+                    like = Like()
+                    like.user_id = request.user
+                    like.photo_id = photo
+                    like.save()
+                    return HttpResponse(status=201)
+        else:
+            return HttpResponseBadRequest('Invalid request')
     else:
-        return HttpResponseBadRequest('Invalid request')
+        return HttpResponse(status=202)
