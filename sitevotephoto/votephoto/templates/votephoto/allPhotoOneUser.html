@@ -1,0 +1,34 @@
+{% extends 'votephoto/base.html' %}
+
+{% block content %}
+    <h1 class="text-center">Ваши фотографии</h1>
+    <br>
+    {% for photo_one in photo %}
+        <div style="float: left; margin-right: 20px;">
+            <div class="card" style="width: 18rem;">
+                <a href="{{photo_one.get_absolute_url}}"><img src="{{photo_one.photo_510x510.url}}" width="290" height="175" class="card-img-top" alt="{{photo_one.content}}"></a>
+                <div class="card-body">
+                    <a href="{{photo_one.get_absolute_url}}" class="text-decoration-none text-info"><p class="card-text">{{photo_one.name}}</p></a>
+                </div>
+                <div class="dropdown text-center">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton{{photo_one.pk}}" data-toggle='dropdown' aria-expanded="false">
+                    ...
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                        <li><a class="dropdown-item" href="{% url 'delete_photo' photo_one.pk %}">Удалить фотографию и все что к ней относится.</a></li>
+                        <li><a class="dropdown-item" href="{% url 'loading_new_photo' photo_one.pk %}">Обновить фотографию.</a></li>
+                    </ul>
+                    <br><br>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+<!-- Нормальный вывод фотографий, 3 в ряд, затем след. строка и снова 3 в ряд. -->
+<script>
+    function countOutputImage () {
+
+    }
+</script>
+
+{% endblock %}
+

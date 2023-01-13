@@ -1,21 +1,33 @@
+import io
+
 from django.contrib.auth.models import AbstractUser
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
-from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.urls import reverse
 from easy_thumbnails.fields import ThumbnailerImageField
 from PIL import Image as Img
-from io import StringIO, BytesIO
+from io import BytesIO
+import os.path
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
 
 class User(AbstractUser):
-    fio = models.CharField(max_length=100, verbose_name="ФИО", null=True)
-    photoUser = ThumbnailerImageField(verbose_name="Фото", blank=True, upload_to='photos/%Y/%m/%d',
-                                      resize_source=dict(size=(300, 300), quality=80, crop=True))
-    dateCreateUser = models.DateField(auto_now_add=True, verbose_name="Дата создания профиля")
-    dateUpdateUser = models.DateTimeField(auto_now=True, verbose_name="Дата и время когда user был обновлен")
-    usualUserOrModer = models.BooleanField(default=False, verbose_name='Модератор?')
+    patronymic = models.CharField(max_length=50,
+                                  verbose_name="Отчество",
+                                  null=True
+                                  )
+    photo_by_user = ThumbnailerImageField(verbose_name="Photo by user",
+                                          blank=True,
+                                          upload_to='photos/%Y/%m/%d',
+                                          resize_source=dict(size=(300, 300),
+                                                             quality=80,
+                                                             crop=True
+                                                             )
+                                          )
+    date_create = models.DateField(auto_now_add=True)
+    date_update = models.DateTimeField(auto_now=True)
+    moderator = models.BooleanField(default=False,
+                                    verbose_name='Is he a moderator?'
+                                    )
 
     def __str__(self):
         return self.username
@@ -27,59 +39,59 @@ class User(AbstractUser):
 
 
 class Photo(models.Model):
-    photoID = models.BigAutoField(primary_key=True)
-    namePhoto = models.CharField(max_length=150, verbose_name='Название фотографии ')
-    сontentPhoto = models.TextField(blank=True, verbose_name='Описание к фотографии')
-    dateCreatePhoto = models.DateField(auto_now_add=True, verbose_name="Дата добавления фотографии")
-    dateUpdatePhoto = models.DateTimeField(auto_now=True, verbose_name="Дата и время когда фотография была обновлена")
-    InfoPublishedPhoto = models.BooleanField(default=False, verbose_name='Опубликовать?')
-    DeletePhoto = models.BooleanField(default=False, verbose_name='Отправлено на удаление?')
-    ModificationPhoto = models.BooleanField(default=False, verbose_name='Изменили фотографию?')
-    newPhoto = models.ImageField(verbose_name='Фотография', blank=False, upload_to='photos_main/%Y/%m/%d')
-    oldPhoto = models.ImageField(verbose_name='Старая фотография', blank=True, upload_to='photos_old/%Y/%m/%d')
-    photo_145x165 = models.ImageField(verbose_name='Фотография размером 145x165', blank=True,
-                                      upload_to='photos_145x165/%Y/%m/%d')
-    photo_510x510 = models.ImageField(verbose_name='Фотография размером 510x510', blank=True,
-                                      upload_to='photos_510x510/%Y/%m/%d')
-    user_id = models.ForeignKey(User, on_delete=models.PROTECT)
+    name = models.CharField(max_length=100)
+    content = models.TextField(blank=True)
+    date_create = models.DateTimeField(auto_now_add=True)
+    date_update = models.DateTimeField(auto_now=True)
+    info_published = models.BooleanField(default=False, verbose_name='To publish?')
+    delete_photo = models.BooleanField(default=False, verbose_name='Delete photo?')
+    modification = models.BooleanField(default=False)
+    new_photo = models.ImageField(blank=False, upload_to='new_photos/%Y/%m/%d')
+    old_photo = models.ImageField(blank=True, upload_to='old_photos/%Y/%m/%d')
+    photo_145x165 = models.ImageField(blank=True, upload_to='photos_145x165/%Y/%m/%d')
+    photo_510x510 = models.ImageField(blank=True, upload_to='photos_510x510/%Y/%m/%d')
+    count_like = models.IntegerField(default=0)
+    count_comment = models.IntegerField(default=0)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
 
     def get_absolute_url(self):
         return reverse('show_photo', kwargs={'photoID': self.pk})
 
     def __str__(self):
-        return self.photoID
+        return f'Name photo: {self.name}'
 
     class Meta:
         verbose_name = 'Фото'
         verbose_name_plural = 'Фотографии'
+        ordering = ('-date_create', )
 
     def save(self, *args, **kwargs):
-        image = Img.open(BytesIO(self.oldPhoto.read()))
-        image.thumbnail((145, 165), Img.ANTIALIAS)
+        image_bytes = BytesIO(self.old_photo.read())
+        image = Img.open(image_bytes)
+        image.thumbnail((510, 510), Img.ANTIALIAS)
         output = BytesIO()
-        image.save(output, format='JPEG', quality=75)
+        image.save(output, format='JPEG', quality=90)
         output.seek(0)
-        self.photo_145x165 = InMemoryUploadedFile(output, 'ImageField', self.oldPhoto.name, 'image/jpeg',
+        self.photo_510x510 = InMemoryUploadedFile(output, 'ImageField', self.old_photo.name, 'image/jpeg',
                                                   output.__sizeof__(), None)
         super(Photo, self).save(*args, **kwargs)
 
-        image = Img.open(BytesIO(self.oldPhoto.read()))
-        image.thumbnail((510, 510), Img.ANTIALIAS)
+        image.thumbnail((145, 165), Img.ANTIALIAS)
         output = BytesIO()
-        image.save(output, format='JPEG', quality=75)
+        image.save(output, format='JPEG', quality=90)
         output.seek(0)
-        self.photo_510x510 = InMemoryUploadedFile(output, 'ImageField', self.oldPhoto.name, 'image/jpeg',
+        self.photo_145x165 = InMemoryUploadedFile(output, 'ImageField', self.old_photo.name, 'image/jpeg',
                                                   output.__sizeof__(), None)
         super(Photo, self).save(*args, **kwargs)
+
 
 
 class Comment(models.Model):
-    commentID = models.BigAutoField(primary_key=True)
-    contentComment = models.TextField(blank=False, verbose_name='Комментарий')
-    dateCreateComment = models.DateField(auto_now_add=True, verbose_name="Дата добавления комментария")
-    dateUpdateComment = models.DateTimeField(auto_now=True, verbose_name="Дата и время когда комментарий был обновлён")
-    user_id = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
-    photo_id = models.ForeignKey(Photo, on_delete=models.CASCADE)
+    content = models.TextField(blank=False)
+    dateCreate = models.DateField(auto_now_add=True)
+    dateUpdate = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
+    photo = models.ForeignKey(Photo, on_delete=models.CASCADE)
     Parent = models.ForeignKey('self', on_delete=models.PROTECT, null=True)
 
     def get_absolute_url(self):
@@ -90,18 +102,28 @@ class Comment(models.Model):
         verbose_name_plural = 'Комментарии'
 
     def __str__(self):
-        return self.contentComment
+        return self.content
 
 
 class Like(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Поставил лайк")
-    photo_id = models.ForeignKey(Photo, on_delete=models.CASCADE, verbose_name="Пост, который содержит лайк")
-    dateCreateLike = models.DateField(auto_now_add=True, verbose_name="Дата добавления лайка")
-    dateUpdateLike = models.DateTimeField(auto_now=True, verbose_name="Дата и время когда клайк был обновлён")
+    user = models.ForeignKey(User,
+                             on_delete=models.CASCADE,
+                             verbose_name="Поставил лайк"
+                             )
+    photo = models.ForeignKey(Photo,
+                              on_delete=models.CASCADE,
+                              verbose_name="Пост, который содержит лайк"
+                              )
+    dateCreate = models.DateField(auto_now_add=True,
+                                  verbose_name="Дата добавления лайка"
+                                  )
+    dateUpdate = models.DateTimeField(auto_now=True,
+                                      verbose_name="Дата и время когда клайк был обновлён"
+                                      )
 
     # content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     # object_id = models.PositiveIntegerField()
     # content_object = GenericForeignKey('content_type', 'object_id')
 
     def __str__(self):
-        return self.user_id + ' лайкнул'
+        return f"{self.user} - лайкнул фотографию {self.photo.name}"

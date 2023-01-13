@@ -2,98 +2,181 @@
 
 
 {% block content %}
-
-    {% for p in photo %}
-       <div class="card mb-3">
-        <div class="card-header fs-5 text-center ">
-            <a href="{{ p.get_absolute_url }}" class="text-decoration-none text-info">{{ p.namePhoto }}</a>
-        </div>
-            <div class="card-body">
-                <div class="media">
-                    <img src="{{ p.photo_510x510.url }}" style=" border: 8px solid #ffffff;" align="left" alt="{{ p.namePhoto }}" width="510" height="510" class="mr-3">
-                    <div class="media body fs-4">
-                    <p class="card-text fw-bold">Описание к фотографии:</p><p>{{ p.сontentPhoto|safe|linebreaks|truncatewords:20 }}</p>
-                    <a href="{{ p.get_absolute_url }}" class="btn btn-dark">Узнать больше о фотографии</a>
-                    </div>
-                </div>
-        </div>
-        <div>
-<!-- Включаем теги из votephotoTags -->
-                {% load votephotoTags %}
-<!-- Передаём getAllLikesIsPhoto id фотографии -->
-                {% getAllLikesIsPhoto p.photoID as likeOnePhoto  %}
-<!-- Передаём TrueAndFalseLikeUserPhoto id юзера и фотографии -->
-                {% TrueAndFalseLikeUserPhoto p.photoID user.pk as TrueOrFalseLike%}
-<!-- Проверяем есть ли лайк у юзера, чтобы понять какую кнопку отобразить-->
-            {% if TrueOrFalseLike %}
-                <div class="row row-cols-auto">
-                    <div class="col"></div>
-                        <div class="text-danger fs-5" id="TextLike{{p.photoID}}">Мне нравится:</div>
-                       <button id="LikeAndNoLike{{p.photoID}}" class="btn btn-danger col-2" onclick="addLikeAJAX({{p.photoID}})">{{ likeOnePhoto }}</button>
-                </div>
-            {% else %}
-                <div class="row row-cols-auto">
-                    <div class="col"></div>
-                        <div class="text-secondary fs-5" id="TextLike{{p.photoID}}">Мне нравится:</div>
-                        <button id="LikeAndNoLike{{p.photoID}}" class="btn btn-outline-secondary col-2" onclick="addLikeAJAX({{p.photoID}})">{{ likeOnePhoto }}</button>
-                </div>
-            {% endif %}
-            <br>
-        </div>
-            <div class="card-footer text-muted">
-                {{ p.dateCreatePhoto }}
-                <br>
-                <div> Автор: {{ p.user_id }} </div>
+<!--    <form action="{% url 'main' %}" method="GET">-->
+<!--        {% csrf_token %}-->
+<!--        {{ sort_form }}-->
+<!--        <br>-->
+<!--        <button type="submit" class="btn btn-dark" onclick="sortedPhoto()">Сортировать</button>-->
+<!--    </form>-->
+    <p>
+        Найти:
+        <input type="text" name="search" id="searchInput">
+    </p>
+    <p>
+        Сортировка:
+        <button id="sortingButton" type="button" class="btn btn-outline-light btn-dark" onclick="getPage('{% url 'sortingMain' '-count_like' %}')">По лайкам</button>
+        <button type="button" class="btn btn-outline-light btn-dark" onclick="getPage('{% url 'sortingMain' '-count_comment' %}')">По комментариям</button>
+        <button type="button" class="btn btn-outline-light btn-dark" onclick="getPage('{% url 'sortingMain' '-date_create' %}')">По дате публикации</button>
+    </p>
+    <div id="postsElem">
+        {% for p in photo %}
+    <!-- Включаем теги из votephotoTags -->
+        {% load votephotoTags %}
+    <!-- Передаём getAllLikesIsPhoto id фотографии -->
+        {% getAllLikesIsPhoto p.pk as likeOnePhoto  %}
+    <!-- Передаём TrueAndFalseLikeUserPhoto id юзера и фотографии -->
+        {% TrueAndFalseLikeUserPhoto p.pk user.pk as TrueOrFalseLike%}
+    <!-- Смотрим какое кол-во комментариев имеет фотография -->
+        {% CountCommentOnePhotoToMain p.pk as CountComment %}
+        {% CountComment p.pk as CountCommentNoContent %}
+           <div class="card mb-3">
+            <div class="card-header fs-5 text-center ">
+                <a href="{{ p.get_absolute_url }}" class="text-decoration-none text-info">{{ p.name }}</a>
             </div>
-        </div>
-    {% empty %}
-        <h4>Новостей нет!</h4>
-    {% endfor %}
+                <div class="card-body">
+                    <div class="media">
+                        <img src="{{ p.photo_510x510.url }}" style="border: 8px solid #ffffff;" align="left" alt="{{ p.name }}" width="510" height="510" class="mr-3">
+                        <div class="media body fs-4">
+                            <p class="card-text fw-bold">Описание к фотографии:</p><p>{{ p.content|safe|linebreaks|truncatewords:20 }}</p>
+                            <a href="{{ p.get_absolute_url }}" class="btn btn-dark">Узнать больше о фотографии</a>
+                        </div>
+                    </div>
+            </div>
+            <div>
+                <!-- Проверяем есть ли лайк у юзера, чтобы понять какую кнопку отобразить-->
+                {% if TrueOrFalseLike %}
+                    <div class="row row-cols-auto">
+                        <div class="col"></div>
+                            <div class="text-danger fs-5" id="TextLike{{p.pk}}">Мне нравится:</div>
+                           <button id="LikeAndNoLike{{p.pk}}" class="btn btn-danger col-2" onclick="addLikeAJAX({{p.pk}})">{{ likeOnePhoto }}</button>
+                    </div>
+                {% else %}
+                    <div class="row row-cols-auto">
+                        <div class="col"></div>
+                            <div class="text-secondary fs-5" id="TextLike{{p.pk}}">Мне нравится:</div>
+                            <button id="LikeAndNoLike{{p.pk}}" class="btn btn-outline-secondary col-2" onclick="addLikeAJAX({{p.pk}})">{{ likeOnePhoto }}</button>
+                    </div>
+                {% endif %}
+                <br>
+            </div>
+                <div class="card-footer text-muted">
+                    {{ p.date_create }}
+                    <br>
+                    <div> Автор: {{ p.user }} </div>
+                </div>
+            </div>
+            {% if CountCommentNoContent != 0%}
+    <!--            <div class="text-center fs-4">Комментарии к фотографии:</div>-->
+    <!--            <br>-->
+                <div class="text-center">
+                    <a href="{{ p.get_absolute_url }}" class="btn btn-dark ">Комментариев: {{CountCommentNoContent}}</a>
+                </div>
+                {% for comment in CountComment %}
+                    <section style="background-color: white">
+                      <div class="container my-2 py-11 text-dark">
+                        <div class="row d-flex justify-content-center">
+                          <div class="col-md-12 col-lg-8 col-xl-9">
+                            <div class="d-flex flex-start">
+                              <img class="rounded-circle shadow-1-strong me-3"
+                                src="{{comment.user.photo_by_user.url}}" alt="avatar" width="65"
+                                height="65" />
+                              <div class="card w-100">
+                                <div class="card-body p-3">
+                                  <div>
+                                    <h5>{{comment.user.username}}</h5>
+                                    <p class="small">5 hours ago</p>
+                                    <p>{{ comment.content }}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+                {% endfor %}
+                <br>
+                <br><br><br>
+            {% endif %}
+        {% empty %}
+            <h4>Фотографий нет.</h4>
+        {% endfor %}
+    </div>
     <script
       src="https://code.jquery.com/jquery-3.6.0.min.js"
       integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
       crossorigin="anonymous"
     ></script>
     <script>
+        async function getPage(url){
+            console.log("Worked AJAX in sorting photo " + url );
+            let response = await fetch(url)
+            if (response.ok){
+                console.log("Worked AJAX in sorting photo");
+                let result  = await response.text();
+                document.getElementById("postsElem").innerHTML = ''
+                document.getElementById("postsElem").innerHTML = result
+            } else {
+                console.log("AJAX ERROR");
+            }
+        }
+
+        searchInput.addEventListener("keydown", async function(event){
+            if (event.key == "Enter"){
+            console.log("Click ENTER");
+            let whatWrote = document.getElementById('searchInput').value;
+            url = "searchMain/" + whatWrote;
+            let response = await fetch(url)
+            if (response.ok){
+                console.log("Worked AJAX in sorting photo");
+                let result  = await response.text();
+                document.getElementById("postsElem").innerHTML = ''
+                document.getElementById("postsElem").innerHTML = result
+            } else {
+                console.log("AJAX ERROR");
+            }
+        }
+        });
+
         async function addLikeAJAX(photo_id){
             console.log("click button");
             console.log(photo_id);
             let likeCountElement = document.getElementById('LikeAndNoLike' + photo_id);
             response = await fetch(
                 {% url 'addlike' %},
-                {
-                method: "POST",
-                body: JSON.stringify({photoID: photo_id, dad: 'dad'}),
-                headers: {
-                    "X-Requested-With": "XMLHttpRequest",
-                    'X-CSRFToken': "{{csrf_token}}",
-                }
-                });
-                if (response.status==201){
-                    console.log("AJAX WORKED ADD LIKE");
-                    let page = document.querySelector('#LikeAndNoLike' + photo_id);
-                    let textLike = document.querySelector('#TextLike' + photo_id);
-                    textLike.classList.toggle('text-danger');
-                    textLike.classList.toggle('text-secondary');
-                    page.classList.toggle('btn-outline-secondary');
-                    page.classList.toggle('btn-danger');
-                    likeCountElement.innerText = Number(likeCountElement.innerText) + 1;
-                } else if(response.status==200){
-                    console.log("AJAX WORKED DELETE LIKE");
-                    let page = document.querySelector('#LikeAndNoLike' + photo_id);
-                    let textLike = document.querySelector('#TextLike' + photo_id);
-                    textLike.classList.toggle('text-danger');
-                    textLike.classList.toggle('text-secondary');
-                    page.classList.toggle('btn-outline-secondary');
-                    page.classList.toggle('btn-danger');
-                    if (likeCountElement.innerText != 0){
-                    likeCountElement.innerText = Number(likeCountElement.innerText) - 1;
+                    {
+                        method: "POST",
+                        body: JSON.stringify({photoID: photo_id}),
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest",
+                            'X-CSRFToken': "{{csrf_token}}",
                     }
-                } else if(response.status==202){
-                    console.log("AJAX WORKED REDIRECT TO LOGIN");
-                    window.location.href = {% url 'login' %};
-                } else {
-                console.log("AJAX ERROR");
+                    });
+                    if (response.status==201){
+                        console.log("AJAX WORKED ADD LIKE");
+                        let page = document.querySelector('#LikeAndNoLike' + photo_id);
+                        let textLike = document.querySelector('#TextLike' + photo_id);
+                        textLike.classList.toggle('text-danger');
+                        textLike.classList.toggle('text-secondary');
+                        page.classList.toggle('btn-outline-secondary');
+                        page.classList.toggle('btn-danger');
+                        likeCountElement.innerText = Number(likeCountElement.innerText) + 1;
+                    } else if(response.status==200){
+                        console.log("AJAX WORKED DELETE LIKE");
+                        let page = document.querySelector('#LikeAndNoLike' + photo_id);
+                        let textLike = document.querySelector('#TextLike' + photo_id);
+                        textLike.classList.toggle('text-danger');
+                        textLike.classList.toggle('text-secondary');
+                        page.classList.toggle('btn-outline-secondary');
+                        page.classList.toggle('btn-danger');
+                        if (likeCountElement.innerText != 0){
+                        likeCountElement.innerText = Number(likeCountElement.innerText) - 1;
+                        }
+                    } else if(response.status==202){
+                        console.log("AJAX WORKED REDIRECT TO LOGIN");
+                        window.location.href = {% url 'login' %};
+                    } else {
+                    console.log("AJAX ERROR");
                 }
             };
     </script>

@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'votephoto.apps.VotephotoConfig',
-    'debug_toolbar',
     'easy_thumbnails',
 ]
 
@@ -51,7 +50,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 INTERNAL_IPS = [
@@ -94,7 +92,7 @@ WSGI_APPLICATION = 'sitevotephoto.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'Votephoto',
+        'NAME': 'VotePhotoTwo',
         'USER': 'postgres',
         'PASSWORD': 'Zxc230104',
     }
@@ -132,7 +130,7 @@ USE_I18N = True
 USE_TZ = True
 
 
-#Users
+# Model User is extends user django
 AUTH_USER_MODEL = "votephoto.User"
 
 
@@ -148,7 +146,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
-
-
-
-

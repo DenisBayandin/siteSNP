@@ -3,21 +3,61 @@
 {% block content %}
     {% csrf_token %}
     {% if request.user.is_authenticated %}
-        <br>
-        <div class="h3"> Имя вашего профиля: {{user.username}} </div>
-        <br>
-        <div class="h5">Фото профиля: <p><img class="border border-dark" src="{{user.photoUser.url}}" width="300" height="300"></p></div>
-        <br>
-        <div class="h5"> ФИО: {{user.fio}}</div>
-        <br>
-        <div class="h5"> Почта: {{user.email}}</div>
-        <br>
-        {% if user.usualUserOrModer %}
-            <div class="h5"> Вы являетесь модером.</div>
-        {% else %}
-            <div class="h5"> Вы не являетесь модером.</div>
-        {% endif %}
-        <br>
+        <div class="row">
+          <div class="col-md-8 mb-4">
+            <div class="card mb-4">
+              <div class="card-header py-3">
+                <h5 class="mb-0">Профиль {{ user.username }}-a</h5>
+              </div>
+              <div class="card-body">
+                <form>
+                  <!-- 2 column grid layout with text inputs for the first and last names -->
+                    <div class="row mb-4">
+                        <div class="col">
+                            <div class="form-outline">
+                                <input type="text" id="form7Example1" class="form-control" value="{{ user.last_name }}"/>
+                                <label class="form-label" for="form7Example1">Фамилия</label>
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <div class="form-outline">
+                                <input type="text" id="form7Example2" class="form-control" value="{{ user.first_name }}"/>
+                                <label class="form-label" for="form7Example2">Имя</label>
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <div class="form-outline">
+                                <input type="text" id="form7Example3" class="form-control" value="{{ user.patronymic }}"/>
+                                <label class="form-label" for="form7Example2">Отчество</label>
+                            </div>
+                        </div>
+                    </div>
+
+                <!-- Text input -->
+                    <div class="form-outline mb-4">
+                    <input type="text" id="form7Example4" class="form-control" value="{{ user.email }}"/>
+                    <label class="form-label" for="form7Example3">Почта</label>
+                    </div>
+
+                    <!-- Text input -->
+                    <div class="form-outline mb-4">
+                    <label class="form-label" for="form7Example5"> Фотография профиля:</label>
+                    <img src="{{ user.photo_by_user.url }}" class="border border-dark">
+                    </div>
+
+                    <!-- Email input -->
+                    <div class="form-outline mb-4">
+                    {% if user.usualUserOrModer %}
+                    <label class="form-label fs-5" for="form7Example6"> Вы являетесь модером. </label>
+                    {% endif %}
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
         <h5>Добавьте фотографию.</h5>
         <form action="{% url 'profile' %}" method="post" enctype="multipart/form-data">
 
@@ -30,7 +70,7 @@
     {% else %}
         <h1> Вы не авторизованы, войдите в профиль. </h1>
         <br>
-        <div><a class="h4 text-dark text-decoration-none" href="{% url 'login' %}">  Нажмите, если хотите войти в   профиль </a></div>
+        <div><a class="h4 text-dark text-decoration-none" href="{% url 'login' %}">  Нажмите, если хотите войти в профиль </a></div>
         <br>
         <div><a class="h4 text-dark text-decoration-none" href="{% url 'register' %}">  Нажмите, если хотите пройти регистрацию </a></div>
     {% endif %}
