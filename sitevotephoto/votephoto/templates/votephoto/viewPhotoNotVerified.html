@@ -1,0 +1,37 @@
+{% extends "admin/base.html" %}
+
+{% block branding %}
+    <a href="/admin/"><h1>Модерирование сайта VotePhoto</h1></a>
+{% endblock %}
+
+{% block extrastyle %}{% endblock %}
+
+{% block coltype %}{% endblock %}
+
+{% block bodyclass %}{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block nav-sidebar %}{% endblock %}
+
+{% block usertools %}
+    {{ block.super }}
+    <h1>123</h1>
+{% endblock %}
+
+{% block content %}
+    {% for photo_one in photo %}
+        <div style="float: left; margin-right: 20px;">
+            <div class="card" style="width: 18rem;">
+                <a href="{{photo_one.get_absolute_url_admin}}"><img src="{{photo_one.photo_510x510.url}}" width="290" height="175" class="card-img-top" alt="{{photo_one.content}}"></a>
+                <div class="card-body">
+                    <a href="{{photo_one.get_absolute_url_admin}}" class="text-decoration-none text-info"><p class="card-text">Имя фотографии: {{photo_one.name}}</p></a>
+                </div>
+                <div class="dropdown text-center">
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <h3>Фотографий не найдено</h3>
+    {% endfor %}
+{% endblock %}

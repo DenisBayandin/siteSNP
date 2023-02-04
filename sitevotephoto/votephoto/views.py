@@ -1,13 +1,15 @@
 import json
 
+from celery import shared_task
 from django.contrib.auth import logout, login
 from django.contrib.auth.views import LoginView
 from django.db.models import Count, Q
 from django.http import HttpResponse, Http404, HttpResponseBadRequest
 from django.shortcuts import render, redirect, get_object_or_404
-from django.utils.html import escape
+from django.utils import timezone
 from django.views.generic import CreateView, ListView
 from .forms import *
+from django_celery_beat.models import PeriodicTask, IntervalSchedule
 
 
 class RegisterUser(CreateView):
@@ -45,7 +47,7 @@ class MainView(ListView):
         return context
 
     def get_queryset(self):
-        self.queryset = Photo.objects.all().order_by('-date_create')
+        self.queryset = Photo.objects.filter(state='Verified')
         return super().get_queryset()
 
 
@@ -53,14 +55,9 @@ class MainSortedView(ListView):
     template_name = 'votephoto/sortedMain.html'
     context_object_name = 'photo'
 
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Отсортированная главная страница'
-        return context
-
     def get_queryset(self):
         get_sorted_name = self.kwargs.get('sorting')
-        self.queryset = Photo.objects.all().order_by(get_sorted_name)
+        self.queryset = Photo.objects.filter(state='Verified').order_by(get_sorted_name)
         return super().get_queryset()
 
 
@@ -68,21 +65,16 @@ class MainSearchView(ListView):
     template_name = 'votephoto/searchMain.html'
     context_object_name = 'photo'
 
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Поиск'
-        return context
-
     def get_queryset(self):
         what_wrote_to_user = self.kwargs.get('search')
         self.queryset = Photo.objects.filter(
-            Q(name__icontains=what_wrote_to_user) | Q(content__icontains=what_wrote_to_user))
+            (Q(name__icontains=what_wrote_to_user) | Q(content__icontains=what_wrote_to_user)), state='Verified')
         if self.queryset.count() == 0:
             photo_search = []
             user_search = User.objects.filter(username__icontains=what_wrote_to_user)
             if user_search != 0:
                 for user_in_search in user_search:
-                    user_photo = Photo.objects.filter(user=user_in_search.pk)
+                    user_photo = Photo.objects.filter(user=user_in_search.pk, state='Verified')
                     for photo_one in user_photo:
                         photo_search.append(photo_one)
                 self.queryset = photo_search
@@ -92,7 +84,7 @@ class MainSearchView(ListView):
             photo_search_to_user = []
             user_search = User.objects.filter(username__icontains=what_wrote_to_user)
             for user_in_search in user_search:
-                all_photo_to_one_user = Photo.objects.filter(user=user_in_search.pk)
+                all_photo_to_one_user = Photo.objects.filter(user=user_in_search.pk, state='Verified')
                 for one_photo_to_one_user in all_photo_to_one_user:
                     photo_search_to_user.append(one_photo_to_one_user)
             set_gueryset = set(self.queryset)
@@ -103,11 +95,108 @@ class MainSearchView(ListView):
         return super().get_queryset()
 
 
-# def searchView(request):
-#     query = request.GET.get('q')
-#     objects = Photo.objects.filter(Q(name__icontains=query) | Q(content__icontains=query))
-#     context = {'title': 'Поиск', 'objects': objects}
-#     return render(request, 'votephoto/search.html', context)
+class SortedAllPhotoOneUser(ListView):
+    template_name = 'votephoto/sortedAllPhotoOneUser.html'
+    context_object_name = 'photo'
+
+    def get_queryset(self):
+        photo_all = []
+        get_sorted_name = self.kwargs.get('sorting')
+        if get_sorted_name == 'All photo':
+            self.queryset = Photo.objects.filter(user=self.request.user.pk)
+            return super().get_queryset()
+        photo_one_user = Photo.objects.filter(user=self.request.user.pk)
+        for photo_one in photo_one_user:
+            if photo_one.state == get_sorted_name:
+                photo_all.append(photo_one)
+        self.queryset = list(set(photo_all))
+        return super().get_queryset()
+
+
+class ViewPhotoNotVerified(ListView):
+    template_name = 'votephoto/viewPhotoNotVerified.html'
+    context_object_name = 'photo'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Проверка фотографий'
+        return context
+
+    def get_queryset(self):
+        if self.request.user.is_staff and self.request.user.is_superuser:
+            self.queryset = Photo.objects.filter(state='Not verified')
+            return super().get_queryset()
+        else:
+            raise Http404(f'{self.request.user.username} не является админом! Зайдите на другой аккаунт!')
+
+
+class ViewPhotoUpdate(ListView):
+    template_name = 'votephoto/viewPhotoUpdate.html'
+    context_object_name = 'photo'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Проверка фотографий'
+        return context
+
+    def get_queryset(self):
+        if self.request.user.is_staff and self.request.user.is_superuser:
+            self.queryset = Photo.objects.filter(state='Update')
+            return super().get_queryset()
+        else:
+            raise Http404(f'{self.request.user.username} не является админом! Зайдите на другой аккаунт!')
+
+
+class ViewPhotoDelete(ListView):
+    template_name = 'votephoto/viewPhotoNotVerified.html'
+    context_object_name = 'photo'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Проверка фотографий'
+        return context
+
+    def get_queryset(self):
+        if self.request.user.is_staff and self.request.user.is_superuser:
+            self.queryset = Photo.objects.filter(state='Delete')
+            return super().get_queryset()
+        else:
+            raise Http404(f'{self.request.user.username} не является админом! Зайдите на другой аккаунт!')
+
+
+def showPhotoAdmin(request, photoID):
+    if request.user.is_staff and request.user.is_superuser:
+        photo = get_object_or_404(Photo, pk=photoID)
+        photo.go_state_on_check()
+        photo.save()
+        return render(request, 'votephoto/showPhotoAdmin.html', {'title': 'Проверка фотографии', 'photo': photo})
+    else:
+        return Http404(Http404(f'{request.user.username} не является админом! Зайдите на другой аккаунт!'))
+
+
+def showPhotoAdminUpdate(request, photoID):
+    if request.user.is_staff and request.user.is_superuser:
+        photo = get_object_or_404(Photo, pk=photoID)
+        photo.save()
+        return render(request, 'votephoto/showPhotoAdminUpdate.html', {'title': 'Проверка фотографии', 'photo': photo})
+    else:
+        return Http404(Http404(f'{request.user.username} не является админом! Зайдите на другой аккаунт!'))
+
+
+def updateStateVerified(request, photoID):
+    photo = get_object_or_404(Photo, pk=photoID)
+    if request.method == 'POST':
+        photo.go_state_verified()
+        photo.save()
+        return redirect('photoNotVerified')
+
+
+def updateStateNotVerified(request, photoID):
+    photo = get_object_or_404(Photo, pk=photoID)
+    if request.method == 'POST':
+        photo.go_state_not_verified()
+        photo.save()
+        return redirect('photoNotVerified')
 
 
 def showOnePhoto(request, photoID):
@@ -146,15 +235,17 @@ def showOnePhoto(request, photoID):
 
 def delete_photo(request, photoID):
     photo = get_object_or_404(Photo, pk=photoID)
-    photo.delete()
+    periodicFunc(photoID)
     return redirect('all_photo')
 
 
-def update_photo(photoID):
+def update_photo(request, photoID):
     up_photo = get_object_or_404(Photo, pk=photoID)
     up_photo.old_photo = up_photo.new_photo
     up_photo.new_photo = None
+    up_photo.go_state_verified()
     up_photo.save()
+    return redirect('photoUpdate')
 
 
 def loading_new_photo(request, photoID):
@@ -163,17 +254,18 @@ def loading_new_photo(request, photoID):
         form = AddNewPhotoForm(request.POST, request.FILES)
         if form.is_valid():
             obj = form.save(commit=False)
-            if form.data['new_photo'] == '':
+            if form.data.get('new_photo') == '':
                 photo.name = obj.name
                 photo.content = obj.content
+                photo.go_state_not_verified()
                 photo.save()
                 return redirect('all_photo')
             else:
                 photo.name = obj.name
                 photo.content = obj.content
                 photo.new_photo = obj.new_photo
+                photo.go_state_update()
                 photo.save()
-                update_photo(photoID)
                 return redirect('all_photo')
     else:
         form = AddNewPhotoForm
@@ -206,43 +298,6 @@ def update_comment(request, commentID, photoID):
             return redirect('show_photo', photoID)
         else:
             return HttpResponse("13321313132231")
-
-
-# def sortedPhoto(request, need_sort):
-#     photos = []
-#     if need_sort == 'DUP':
-#         photos = Photo.objects.all().order_by('date_update')
-#     elif need_sort == 'DDOWN':
-#         photos = Photo.objects.all().order_by('-date_update')
-#     elif need_sort == 'CDOWN':
-#         comment_sorted = Comment.objects.values('photo').annotate(count_comment=Count('pk')).order_by(
-#             '-count_comment')
-#         for photo in comment_sorted:
-#             photos.append(Photo.objects.get(pk=photo['photo']))
-#     elif need_sort == 'CUP':
-#         comment_sorted = Comment.objects.values('photo').annotate(count_comment=Count('pk')).order_by(
-#             'count_comment')
-#         for photo in comment_sorted:
-#             photos.append(Photo.objects.get(pk=photo['photo']))
-#         # return HttpResponse(status=200)
-#     elif need_sort == 'LUP':
-#         like_sorted = Like.objects.values('photo').annotate(count_like=Count('pk')).order_by('count_like')
-#         for photo in like_sorted:
-#             photos.append(Photo.objects.get(pk=photo['photo']))
-#     elif need_sort == 'LDOWN':
-#         like_sorted = Like.objects.values('photo').annotate(count_like=Count('pk')).order_by('-count_like')
-#         for photo in like_sorted:
-#             photos.append(Photo.objects.get(pk=photo['photo']))
-#     return photos
-
-
-# def main_view(request):
-#     photos = sortedPhoto(request)
-#     sort_form = SortedForm
-#     context = {'title': "Главная страница",
-#                'photo': photos,
-#                'sort_form': sort_form}
-#     return render(request, 'votephoto/main.html', context)
 
 
 def profile(request):
@@ -295,6 +350,24 @@ def addlike(request):
 
 def viewAllPhoto(request):
     photos = Photo.objects.filter(user=request.user)
-    # breakpoint()
     context = {'title': f'Фотографии {request.user.username}-a', 'photo': photos}
     return render(request, 'votephoto/allPhotoOneUser.html', context)
+
+
+def periodicFunc(photoID):
+    if Photo.objects.filter(state='Delete').count() != 0:
+        PeriodicTask.objects.get_or_create(
+            name=f'Delete photo {photoID}',
+            task='repeat_delete_photo',
+            interval=IntervalSchedule.objects.get(every=10, period='seconds'),
+            start_time=timezone.now(),
+        )
+
+
+@shared_task(name="repeat_delete_photo")
+def repeat_delete_photo():
+    breakpoint()
+    if Photo.objects.filter(state='Delete').count() != 0:
+        print(123123123123123)
+        for one_photo in Photo.objects.filter(state='Delete'):
+            one_photo.delete()

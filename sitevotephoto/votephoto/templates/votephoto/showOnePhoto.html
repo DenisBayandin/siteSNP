@@ -53,6 +53,9 @@
             {{ photo.date_create }}
             <br>
             <div> Автор: {{ photo.user }} </div>
+            {% if photo.state != 'Verified' %}
+            <div class="text-danger fs-5"> Фотография на проверке</div>
+            {% endif %}
         </div>
     </div>
 

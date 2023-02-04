@@ -1,12 +1,10 @@
-import io
-
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
 from easy_thumbnails.fields import ThumbnailerImageField
 from PIL import Image as Img
 from io import BytesIO
-import os.path
+from django_fsm import FSMField, transition
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
 
@@ -25,14 +23,12 @@ class User(AbstractUser):
                                           )
     date_create = models.DateField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)
-    moderator = models.BooleanField(default=False,
-                                    verbose_name='Is he a moderator?'
-                                    )
 
     def __str__(self):
         return self.username
 
     class Meta:
+        db_table = 'user_votephoto'
         verbose_name = "Юзер"
         verbose_name_plural = "Юзеры"
         # ordering = ['-dateCreateUser']
@@ -43,9 +39,10 @@ class Photo(models.Model):
     content = models.TextField(blank=True)
     date_create = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)
+    date_delete = models.DateTimeField(null=True)
     info_published = models.BooleanField(default=False, verbose_name='To publish?')
-    delete_photo = models.BooleanField(default=False, verbose_name='Delete photo?')
     modification = models.BooleanField(default=False)
+    photo_delete = models.ImageField(blank=True, null=True, upload_to='delete_photos/%Y/%m/%d')
     new_photo = models.ImageField(blank=False, upload_to='new_photos/%Y/%m/%d')
     old_photo = models.ImageField(blank=True, upload_to='old_photos/%Y/%m/%d')
     photo_145x165 = models.ImageField(blank=True, upload_to='photos_145x165/%Y/%m/%d')
@@ -53,17 +50,45 @@ class Photo(models.Model):
     count_like = models.IntegerField(default=0)
     count_comment = models.IntegerField(default=0)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
+    state = FSMField(default='Not verified', protected=True, verbose_name='Статус фотографии')
+
+    class Meta:
+        db_table = 'photo'
+        verbose_name = 'Фото'
+        verbose_name_plural = 'Фотографии'
+        ordering = ('-date_create',)
+
+    @transition(field=state, source='Not verified', target='On check')
+    def go_state_on_check(self):
+        return 'Status changed from not verified to on check'
+
+    @transition(field=state, source=['On check', 'Update'], target='Verified')
+    def go_state_verified(self):
+        return 'Status changed from on check to verified'
+
+    @transition(field=state, source=['Not verified', 'On check', 'Verified', 'Update'], target='Delete')
+    def go_state_photo_delete(self):
+        return 'State changed to delete'
+
+    @transition(field=state, source=['Verified', 'On check', 'Delete', 'Update'], target='Not verified')
+    def go_state_not_verified(self):
+        return 'Status changed to not verified'
+
+    @transition(field=state, source=['Not verified', 'Verified', 'On check', 'Delete'], target='Update')
+    def go_state_update(self):
+        return 'Status changed to update'
 
     def get_absolute_url(self):
         return reverse('show_photo', kwargs={'photoID': self.pk})
 
+    def get_absolute_url_admin(self):
+        return reverse('showPhotoAdmin', kwargs={'photoID': self.pk})
+
+    def get_absolute_url_admin_update(self):
+        return reverse('showPhotoAdminUpdate', kwargs={'photoID': self.pk})
+
     def __str__(self):
         return f'Name photo: {self.name}'
-
-    class Meta:
-        verbose_name = 'Фото'
-        verbose_name_plural = 'Фотографии'
-        ordering = ('-date_create', )
 
     def save(self, *args, **kwargs):
         image_bytes = BytesIO(self.old_photo.read())
@@ -85,7 +110,6 @@ class Photo(models.Model):
         super(Photo, self).save(*args, **kwargs)
 
 
-
 class Comment(models.Model):
     content = models.TextField(blank=False)
     dateCreate = models.DateField(auto_now_add=True)
@@ -98,6 +122,7 @@ class Comment(models.Model):
         return reverse('show_comment', kwargs={'commentID': self.pk})
 
     class Meta:
+        db_table = 'comment'
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
 
@@ -112,7 +137,7 @@ class Like(models.Model):
                              )
     photo = models.ForeignKey(Photo,
                               on_delete=models.CASCADE,
-                              verbose_name="Пост, который содержит лайк"
+                              verbose_name="Фотография, которая содержит лайк"
                               )
     dateCreate = models.DateField(auto_now_add=True,
                                   verbose_name="Дата добавления лайка"
@@ -127,3 +152,8 @@ class Like(models.Model):
 
     def __str__(self):
         return f"{self.user} - лайкнул фотографию {self.photo.name}"
+
+    class Meta:
+        db_table = 'like'
+        verbose_name = 'Лайк'
+        verbose_name_plural = 'Лайки'
