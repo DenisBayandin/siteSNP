@@ -30,6 +30,10 @@
                         </ul>
                         {% if photo_one.state == 'Verified' %}
                             <div class="text-success">Фотография прошла проверку</div>
+                        {% elif photo_one.state == 'Delete' %}
+                            <div class="text-danger">Фотография на удаление</div>
+                        {% elif photo_one.state == 'On check' %}
+                            <div class="text-warning">Фотография на проверке</div>
                         {% else %}
                             <div class="text-danger"> Фотография не проверена</div>
                         {% endif %}
@@ -39,20 +43,20 @@
             </div>
         {% endfor %}
     </div>
-<script>
-    async function sortedPhoto(url){
-            console.log("Worked AJAX in sorting photo " + url );
-            let response = await fetch(url)
-            if (response.ok){
-                console.log("Worked AJAX in sorting photo");
-                let result  = await response.text();
-                document.getElementById("photoOneUser").innerHTML = ''
-                document.getElementById("photoOneUser").innerHTML = result
-            } else {
-                console.log("AJAX ERROR");
-            }
-        }
 
-</script>
+    <script>
+        async function sortedPhoto(url){
+                console.log("Worked AJAX in sorting photo " + url );
+                let response = await fetch(url)
+                if (response.ok){
+                    console.log("Worked AJAX in sorting photo");
+                    let result  = await response.text();
+                    document.getElementById("photoOneUser").innerHTML = ''
+                    document.getElementById("photoOneUser").innerHTML = result
+                } else {
+                    console.log("AJAX ERROR");
+                }
+            }
+    </script>
 {% endblock %}
 

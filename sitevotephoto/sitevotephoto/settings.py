@@ -9,9 +9,10 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
 from pathlib import Path
 import os.path
+
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,7 +24,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-4rc*nmcs8x)t%3a3l^q3&n41d7p*y0l)0*x(_st_k(zq60)gnl'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
+DEBUG = config("DEBUG", default=0)
 
 ALLOWED_HOSTS = []
 
@@ -39,6 +41,7 @@ INSTALLED_APPS = [
     'votephoto.apps.VotephotoConfig',
     'easy_thumbnails',
     'django_celery_beat',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -90,9 +93,11 @@ WSGI_APPLICATION = 'sitevotephoto.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'VotePhotoTwo',
-        'USER': 'postgres',
+        'NAME': 'VotePhotoThree',
+        'USER': 'denis',
         'PASSWORD': 'Zxc230104',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -144,4 +149,10 @@ MEDIA_URL = "/media/"
 
 # # Celery settings
 # result_backend = 'db+postgresql://scott:tiger@localhost/VotePhotoTwo'
+CELERY_RESULT_BACKEND = "django-db"
 
+CELERY_BROKER_URL = config('CELERY_BROKER_REDIS_URL', default='redis://localhost:6379')
+
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
+
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'

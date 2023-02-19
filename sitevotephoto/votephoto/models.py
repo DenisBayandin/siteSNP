@@ -40,6 +40,7 @@ class Photo(models.Model):
     date_create = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)
     date_delete = models.DateTimeField(null=True)
+    date_now = models.DateTimeField(null=True)
     info_published = models.BooleanField(default=False, verbose_name='To publish?')
     modification = models.BooleanField(default=False)
     photo_delete = models.ImageField(blank=True, null=True, upload_to='delete_photos/%Y/%m/%d')

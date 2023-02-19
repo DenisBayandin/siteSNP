@@ -17,8 +17,12 @@
                     </ul>
                     {% if photo_one.state == 'Verified' %}
                         <div class="text-success">Фотография прошла проверку</div>
+                    {% elif photo_one.state == 'Delete' %}
+                        <div class="text-danger">Фотография на удаление</div>
+                    {% elif photo_one.state == 'On check' %}
+                        <div class="text-warning">Фотография на проверке</div>
                     {% else %}
-                        <div class="text-danger"> Фотография на проверке</div>
+                        <div class="text-danger"> Фотография не проверена</div>
                     {% endif %}
                     <br><br>
                 </div>

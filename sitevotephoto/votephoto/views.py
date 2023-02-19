@@ -1,5 +1,6 @@
 import json
-
+from django.utils import timezone
+from datetime import datetime, timedelta
 from celery import shared_task
 from django.contrib.auth import logout, login
 from django.contrib.auth.views import LoginView
@@ -124,7 +125,9 @@ class ViewPhotoNotVerified(ListView):
 
     def get_queryset(self):
         if self.request.user.is_staff and self.request.user.is_superuser:
-            self.queryset = Photo.objects.filter(state='Not verified')
+            set_gueryset = set(Photo.objects.filter(state='Not verified'))
+            set_photo_search_to_user = set(Photo.objects.filter(state='On check'))
+            self.queryset = list(set_gueryset.union(set_photo_search_to_user))
             return super().get_queryset()
         else:
             raise Http404(f'{self.request.user.username} не является админом! Зайдите на другой аккаунт!')
@@ -167,9 +170,14 @@ class ViewPhotoDelete(ListView):
 def showPhotoAdmin(request, photoID):
     if request.user.is_staff and request.user.is_superuser:
         photo = get_object_or_404(Photo, pk=photoID)
-        photo.go_state_on_check()
-        photo.save()
-        return render(request, 'votephoto/showPhotoAdmin.html', {'title': 'Проверка фотографии', 'photo': photo})
+        if photo.state == 'On check':
+            photo.go_state_not_verified()
+            photo.go_state_on_check()
+            return render(request, 'votephoto/showPhotoAdmin.html', {'title': 'Проверка фотографии', 'photo': photo})
+        else:
+            photo.go_state_on_check()
+            photo.save()
+            return render(request, 'votephoto/showPhotoAdmin.html', {'title': 'Проверка фотографии', 'photo': photo})
     else:
         return Http404(Http404(f'{request.user.username} не является админом! Зайдите на другой аккаунт!'))
 
@@ -231,12 +239,6 @@ def showOnePhoto(request, photoID):
                    'title': photo.name,
                    'show_comments': comment_show,
                    'show_children_comment': commentChildren_show})
-
-
-def delete_photo(request, photoID):
-    photo = get_object_or_404(Photo, pk=photoID)
-    periodicFunc(photoID)
-    return redirect('all_photo')
 
 
 def update_photo(request, photoID):
@@ -354,20 +356,25 @@ def viewAllPhoto(request):
     return render(request, 'votephoto/allPhotoOneUser.html', context)
 
 
-def periodicFunc(photoID):
-    if Photo.objects.filter(state='Delete').count() != 0:
-        PeriodicTask.objects.get_or_create(
-            name=f'Delete photo {photoID}',
-            task='repeat_delete_photo',
-            interval=IntervalSchedule.objects.get(every=10, period='seconds'),
-            start_time=timezone.now(),
-        )
+@shared_task(name="celery_delete_photo")
+def celery_delete_photo():
+    photo_delete_all = Photo.objects.filter(state='Delete')
+    count_photo_delete = Photo.objects.filter(state='Delete').count()
+    for one_photo_delete in photo_delete_all:
+        one_photo_delete.date_now = timezone.now()
+        one_photo_delete.save()
+        if one_photo_delete.date_now >= one_photo_delete.date_delete:
+            one_photo_delete.delete()
+    if count_photo_delete >= 1:
+        return 'There are photos to delete.'
+    else:
+        return 'No photos to delete.'
 
 
-@shared_task(name="repeat_delete_photo")
-def repeat_delete_photo():
-    breakpoint()
-    if Photo.objects.filter(state='Delete').count() != 0:
-        print(123123123123123)
-        for one_photo in Photo.objects.filter(state='Delete'):
-            one_photo.delete()
+def delete_photo(request, photoID):
+    photo = get_object_or_404(Photo, pk=photoID)
+    photo.date_delete = datetime.now() + timedelta(minutes=15)
+    photo.go_state_photo_delete()
+    photo.date_now = datetime.now() + timedelta(seconds=1)
+    photo.save()
+    return redirect('main')
