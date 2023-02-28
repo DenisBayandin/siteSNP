@@ -1,4 +1,6 @@
 from django.urls import path
+from rest_framework.authtoken.views import obtain_auth_token
+
 from .views import *
 
 urlpatterns = [
@@ -25,4 +27,9 @@ urlpatterns = [
     path('photoDelete/', ViewPhotoDelete.as_view(), name='photoDelete'),
     path('show_photo_admin_update/<int:photoID>/', showPhotoAdminUpdate, name='showPhotoAdminUpdate'),
     path('updatePhotoInAdmin/<int:photoID>/', update_photo, name='updatePhotoInAdmin'),
+    path('cancle_delete_photo/<int:photoID>/', cancel_delete_photo, name='cancelDeletePhoto'),
+    path('token/', obtain_auth_token),
+    path('rename_token/', rename_token, name='rename_token'),
+    path('rename_profile/', rename_profile, name='rename_profile'),
+
 ]

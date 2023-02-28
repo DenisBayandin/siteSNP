@@ -9,16 +9,16 @@
 <!-- Смотрим какое кол-во комментариев имеет фотография -->
     {% CountCommentOnePhotoToMain p.pk as CountComment %}
     {% CountComment p.pk as CountCommentNoContent %}
-       <div class="card mb-3">
+    <div class="card mb-3" style="width: 36rem;">
         <div class="card-header fs-5 text-center ">
             <a href="{{ p.get_absolute_url }}" class="text-decoration-none text-info">{{ p.name }}</a>
         </div>
             <div class="card-body">
                 <div class="media">
-                    <img src="{{ p.photo_510x510.url }}" style="border: 8px solid #ffffff;" align="left" alt="{{ p.name }}" width="510" height="510" class="mr-3">
+                    <a href="{{ p.get_absolute_url }}"><img src="{{ p.photo_510x510.url }}" title="{{ p.content }}" style="border: 8px solid #ffffff;" align="left" alt="{{ p.name }}" width="510" height="510" class="mr-3"></a>
                     <div class="media body fs-4">
-                        <p class="card-text fw-bold">Описание к фотографии:</p><p>{{ p.content|safe|linebreaks|truncatewords:20 }}</p>
-                        <a href="{{ p.get_absolute_url }}" class="btn btn-dark">Узнать больше о фотографии</a>
+<!--                        <p class="card-text fw-bold">Описание к фотографии:</p><p>{{ p.content|safe|linebreaks|truncatewords:20 }}</p>-->
+<!--                        <a href="{{ p.get_absolute_url }}" class="btn btn-dark">Узнать больше о фотографии</a>-->
                     </div>
                 </div>
         </div>

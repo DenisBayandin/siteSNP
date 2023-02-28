@@ -109,4 +109,7 @@ class AddNewPhotoForm(forms.ModelForm):
         super(AddNewPhotoForm, self).__init__(*args, **kwargs)
 
         for key in self.fields:
+            self.fields["name"].required = False
+            self.fields["content"].required = False
             self.fields["new_photo"].required = False
+

@@ -2,7 +2,7 @@
     <br>
     {% for photo_one in photo %}
         <div style="float: left; margin-right: 20px;">
-            <div class="card" style="width: 18rem;">
+            <div class="card" style="width: 18rem; height: 22rem;">
                 <a href="{{photo_one.get_absolute_url}}"><img src="{{photo_one.photo_510x510.url}}" width="290" height="175" class="card-img-top" alt="{{photo_one.content}}"></a>
                 <div class="card-body">
                     <a href="{{photo_one.get_absolute_url}}" class="text-decoration-none text-info"><p class="card-text">{{photo_one.name}}</p></a>
@@ -21,9 +21,11 @@
                         <div class="text-danger">Фотография на удаление</div>
                     {% elif photo_one.state == 'On check' %}
                         <div class="text-warning">Фотография на проверке</div>
+                    {% elif photo_one.state == 'Update' %}
+                        <div class="text-danger">Фотография не проверена (обновление)</div>
                     {% else %}
                         <div class="text-danger"> Фотография не проверена</div>
-                    {% endif %}
+                        {% endif %}
                     <br><br>
                 </div>
             </div>

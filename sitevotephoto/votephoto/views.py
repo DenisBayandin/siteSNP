@@ -1,16 +1,21 @@
 import json
+from http import cookies
+
+from flask import jsonify
+from django.contrib.sessions.backends.db import SessionStore
+from django.contrib.sessions.models import Session
 from django.utils import timezone
+from rest_framework.authtoken.models import Token
 from datetime import datetime, timedelta
 from celery import shared_task
 from django.contrib.auth import logout, login
 from django.contrib.auth.views import LoginView
 from django.db.models import Count, Q
-from django.http import HttpResponse, Http404, HttpResponseBadRequest
+from django.http import HttpResponse, Http404, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.views.generic import CreateView, ListView
 from .forms import *
-from django_celery_beat.models import PeriodicTask, IntervalSchedule
 
 
 class RegisterUser(CreateView):
@@ -303,6 +308,7 @@ def update_comment(request, commentID, photoID):
 
 
 def profile(request):
+    token = get_object_or_404(Token, user=request.user.pk)
     if request.method == 'POST':
         form = AddPhotoForm(request.POST, request.FILES)
         if form.is_valid():
@@ -312,7 +318,9 @@ def profile(request):
             return redirect('main')
     else:
         form = AddPhotoForm
-    return render(request, 'votephoto/profile.html', {'form': form, 'title': 'Личный кабинет'})
+    return render(request, 'votephoto/profile.html', {'form': form,
+                                                      'title': 'Личный кабинет',
+                                                      'token': token})
 
 
 def logout_view(request):
@@ -377,4 +385,47 @@ def delete_photo(request, photoID):
     photo.go_state_photo_delete()
     photo.date_now = datetime.now() + timedelta(seconds=1)
     photo.save()
-    return redirect('main')
+    return redirect('all_photo')
+
+
+def cancel_delete_photo(request, photoID):
+    photo = get_object_or_404(Photo, pk=photoID)
+    photo.go_state_not_verified()
+    photo.date_now = None
+    photo.date_delete = None
+    photo.save()
+    return redirect('all_photo')
+
+
+def rename_token(request):
+    token = get_object_or_404(Token, user=request.user.pk)
+    token.delete()
+    token = Token.objects.create(user=request.user)
+    data = {"status": 200, "token": str(token)}
+    return JsonResponse(data)
+    # try:
+    #     return jsonify(data)
+    # except:
+    #     breakpoint()
+
+
+def rename_profile(request):
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    data = json.load(request)
+    new_name = data.get('new_name')
+    new_family = data.get('new_family')
+    new_patronymic = data.get('new_patronymic')
+    new_email = data.get('new_email')
+    new_username = data.get('new_username')
+    if is_ajax:
+        if request.method == 'POST':
+            user = User.objects.get(pk=request.user.pk)
+            user.username = new_username
+            user.first_name = new_name
+            user.last_name = new_family
+            user.patronymic = new_patronymic
+            user.email = new_email
+            user.save()
+            return HttpResponse(status=200)
+    else:
+        return HttpResponse("Ошибка.", status=400, reason='Invalid request')
