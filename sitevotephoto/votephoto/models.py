@@ -1,11 +1,12 @@
+from io import BytesIO
+
+from PIL import Image as Img
 from django.contrib.auth.models import AbstractUser
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import models
 from django.urls import reverse
-from easy_thumbnails.fields import ThumbnailerImageField
-from PIL import Image as Img
-from io import BytesIO
 from django_fsm import FSMField, transition
-from django.core.files.uploadedfile import InMemoryUploadedFile
+from easy_thumbnails.fields import ThumbnailerImageField
 
 
 class User(AbstractUser):
@@ -14,6 +15,7 @@ class User(AbstractUser):
                                   null=True
                                   )
     photo_by_user = ThumbnailerImageField(verbose_name="Photo by user",
+                                          null=True,
                                           blank=True,
                                           upload_to='photos/%Y/%m/%d',
                                           resize_source=dict(size=(300, 300),
@@ -21,8 +23,12 @@ class User(AbstractUser):
                                                              crop=True
                                                              )
                                           )
+    url_photo_by_user_from_VK = models.URLField(null=True)
     date_create = models.DateField(auto_now_add=True)
     date_update = models.DateTimeField(auto_now=True)
+    @property
+    def group_name(self):
+        return f"user_{self.pk}s"
 
     def __str__(self):
         return self.username
@@ -158,3 +164,24 @@ class Like(models.Model):
         db_table = 'like'
         verbose_name = 'Лайк'
         verbose_name_plural = 'Лайки'
+
+
+class Notification(models.Model):
+    sender = models.ForeignKey(User,
+                               on_delete=models.CASCADE,
+                               verbose_name='Отправил уведомление',
+                               blank=True,
+                               null=True,
+                               related_name='sender'
+                               )
+    recipient = models.ForeignKey(User,
+                                  on_delete=models.CASCADE,
+                                  verbose_name='Получил уведомление',
+                                  blank=True,
+                                  null=True,
+                                  related_name='recipient'
+                                  )
+    message = models.CharField(max_length=250,
+                               null=True,
+                               blank=True
+                               )

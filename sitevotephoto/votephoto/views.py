@@ -1,21 +1,23 @@
 import json
-from http import cookies
-
-from flask import jsonify
-from django.contrib.sessions.backends.db import SessionStore
-from django.contrib.sessions.models import Session
-from django.utils import timezone
-from rest_framework.authtoken.models import Token
 from datetime import datetime, timedelta
+
+import vk
+from asgiref.sync import async_to_sync
 from celery import shared_task
+from channels.layers import get_channel_layer
 from django.contrib.auth import logout, login
 from django.contrib.auth.views import LoginView
-from django.db.models import Count, Q
-from django.http import HttpResponse, Http404, HttpResponseBadRequest, JsonResponse
+from django.db.models import Q
+from django.http import HttpResponse, Http404, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.views.generic import CreateView, ListView
+from rest_framework.authtoken.models import Token
+
 from .forms import *
+
+version_vk_api = '5.131'
+channel_layer = get_channel_layer()
 
 
 class RegisterUser(CreateView):
@@ -201,6 +203,16 @@ def updateStateVerified(request, photoID):
     if request.method == 'POST':
         photo.go_state_verified()
         photo.save()
+        get_user_which_create_photo = photo.user_id
+        get_user = User.objects.get(pk=get_user_which_create_photo)
+        group_user_which_create_photo = get_user.group_name
+        notification = Notification.objects.create()
+        notification.message = f"Вашу фотографию '{photo.name}' одобрили."
+        notification.save()
+        async_to_sync(channel_layer.group_send)(group_user_which_create_photo, {
+            "type": "send_new_data",
+            "message": notification.message
+        })
         return redirect('photoNotVerified')
 
 
@@ -209,6 +221,16 @@ def updateStateNotVerified(request, photoID):
     if request.method == 'POST':
         photo.go_state_not_verified()
         photo.save()
+        get_user_which_create_photo = photo.user_id
+        get_user = User.objects.get(pk=get_user_which_create_photo)
+        group_user_which_create_photo = get_user.group_name
+        notification = Notification.objects.create()
+        notification.message = f"Вашу фотографию '{photo.name}' отклонили."
+        notification.save()
+        async_to_sync(channel_layer.group_send)(group_user_which_create_photo, {
+            "type": "send_new_data",
+            "message": notification.message
+        })
         return redirect('photoNotVerified')
 
 
@@ -235,6 +257,19 @@ def showOnePhoto(request, photoID):
             add_comment_to_photo = Photo.objects.get(pk=photoID)
             add_comment_to_photo.count_comment += 1
             add_comment_to_photo.save()
+            pk_user_create_photo = add_comment_to_photo.user_id
+            get_user_create_photo = User.objects.get(pk=pk_user_create_photo)
+            group_user_which_create_photo = get_user_create_photo.group_name
+            user_create_notification = request.user
+            notification = Notification.objects.create(sender=user_create_notification)
+            notification.message = f'Пользователь {notification.sender} оставил ' \
+                                   f'комментарий под фотографией: {add_comment_to_photo.name}' \
+                                   f'\nОбщее кол-во комментариев на фотографии: {add_comment_to_photo.count_comment}'
+            notification.save()
+            async_to_sync(channel_layer.group_send)(group_user_which_create_photo, {
+                "type": "send_new_data",
+                "message": notification.message
+            })
             return redirect(photo.get_absolute_url())
     else:
         form = AddComment
@@ -303,12 +338,44 @@ def update_comment(request, commentID, photoID):
             comment.content = newContent
             comment.save()
             return redirect('show_photo', photoID)
-        else:
-            return HttpResponse("13321313132231")
 
 
 def profile(request):
-    token = get_object_or_404(Token, user=request.user.pk)
+    """
+        Функция профиля.
+        Сперва проверяем, если ли Token у текущего пользователя, если нет, то создаём новый
+        передавая текушего пользователя
+        Затем проверяем, есть ли фотография у нашего профиля, то бишь photo_by_user:
+        (if user.photo_by_user is None:)
+        Если фотографии нет, то мы проверям, можем ли мы ещё использовать access_token предоставленный VK
+        Если время использования токена вышло, то мы logout и просим пользователя войти снова,
+        чтобы создать новый access_token.
+        Если же мы ещё можем использовать access_token, то мы его получаем.
+        Затем получаем получаем фотографию аватарки в вк и записываем её url
+        в url_photo_by_user_from_VK.
+    """
+    try:
+        token = Token.objects.get(user=request.user.pk)
+    except:
+        token = Token.objects.create(user=request.user)
+        token.save()
+    user = request.user
+    try:
+        photo_user = user.photo_by_user.url
+    except:
+        social = user.social_auth.get(provider='vk-oauth2')
+        time_life_token = social.extra_data['expires']
+        time_create_token = social.created
+        if time_create_token + timedelta(seconds=time_life_token) < timezone.now():
+            social.created = social.modified
+            social.save()
+            logout(request)
+            return redirect('login')
+        token = social.extra_data['access_token']
+        api = vk.API(access_token=token, v=version_vk_api)
+        json_vk = api.users.get(fields='photo_200')
+        user.url_photo_by_user_from_VK = json_vk[0]['photo_200']
+        user.save()
     if request.method == 'POST':
         form = AddPhotoForm(request.POST, request.FILES)
         if form.is_valid():
@@ -329,6 +396,14 @@ def logout_view(request):
 
 
 def addlike(request):
+    """
+        Функция создания и удаления лайка.
+        Сперва получаем ID фотографии
+        Затем проверяем, поставил ли пользователь лайк на нашу фотографию
+        Если да, то получаем лайк, удаляем его и уменьшем кол-во лайков на 1, отправляем status 200
+        Если нет, получаем фотографию, создаём лайк и передаём пользователя и фотографию,
+        а после этого увеличиваем кол-во лайков на 1 и отправляем status 200
+    """
     if request.user.is_authenticated:
         is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
         data = json.load(request)
@@ -359,6 +434,11 @@ def addlike(request):
 
 
 def viewAllPhoto(request):
+    """
+        Все фотографии одного пользователя.
+        Получаем фотографии текущего пользователя.
+    """
+
     photos = Photo.objects.filter(user=request.user)
     context = {'title': f'Фотографии {request.user.username}-a', 'photo': photos}
     return render(request, 'votephoto/allPhotoOneUser.html', context)
@@ -366,6 +446,12 @@ def viewAllPhoto(request):
 
 @shared_task(name="celery_delete_photo")
 def celery_delete_photo():
+    """
+        Получаем фотографии со state = Delete и их количество
+        После чего для каждой такой фотографии меняем поле date_now на текущее время
+        Далее проверяем, если текущее время больше времени, когда фотографию нужно удалить,
+        То фотографию удаляем.
+    """
     photo_delete_all = Photo.objects.filter(state='Delete')
     count_photo_delete = Photo.objects.filter(state='Delete').count()
     for one_photo_delete in photo_delete_all:
@@ -380,15 +466,44 @@ def celery_delete_photo():
 
 
 def delete_photo(request, photoID):
+    """
+        Функция получает фотографию, после чего заносит в БД данные о времени, когда её нужно удалить
+        меняет state на delete.
+    """
     photo = get_object_or_404(Photo, pk=photoID)
     photo.date_delete = datetime.now() + timedelta(minutes=15)
-    photo.go_state_photo_delete()
     photo.date_now = datetime.now() + timedelta(seconds=1)
+    photo.go_state_photo_delete()
     photo.save()
+    # TODO Отправка уведомлений тем, у кого есть комментарии к этой фотографии.
+    get_coment_to_the_photo = Comment.objects.filter(photo_id=photo.pk)
+    check_send_notification = []
+    for comment in get_coment_to_the_photo:
+        get_user = User.objects.get(pk=comment.user_id)
+        if get_user.pk in check_send_notification:
+            continue
+        else:
+            check_send_notification.append(get_user.pk)
+            group_name_to_create_comment = get_user.group_name
+            notification_comment_on_the_photo_delete = Notification.objects.create()
+            notification_comment_on_the_photo_delete.message = f"Ваш/Ваши комментарий/комментарии " \
+                                                               f"к фотографии '{photo.name}' " \
+                                                               f"скоро будет/будут удалён/удалены, так как " \
+                                                               f"фотография отправлена на удаление."
+            notification_comment_on_the_photo_delete.save()
+            async_to_sync(channel_layer.group_send)(group_name_to_create_comment, {
+                "type": "send_new_data",
+                "message": notification_comment_on_the_photo_delete.message
+            })
     return redirect('all_photo')
 
 
 def cancel_delete_photo(request, photoID):
+    """
+        Функция отмены удаления фотографии.
+        Получаем фотографию, затем меняем state на Not verified
+        Ставим поля date_now, date_delete на None
+    """
     photo = get_object_or_404(Photo, pk=photoID)
     photo.go_state_not_verified()
     photo.date_now = None
@@ -398,6 +513,12 @@ def cancel_delete_photo(request, photoID):
 
 
 def rename_token(request):
+    """
+        Функция генерирования нового токена.
+        Получаем TOKEN по текущему пользователю.
+        После чего удаляем его и создаём новый, передавая текущего юзера
+        И отправляем статус, токен в асинхронный запрос.
+    """
     token = get_object_or_404(Token, user=request.user.pk)
     token.delete()
     token = Token.objects.create(user=request.user)
@@ -410,6 +531,16 @@ def rename_token(request):
 
 
 def rename_profile(request):
+    """
+        Функция для переименования данных в профиле.
+        data - данные, которые пришли с javascript при работе асинхронного запроса
+        new_... - переменные, в которых хранятся данные нового имени, фамилии и т.п.
+        Функция получает новые данные с асинхронного запроса,
+        после чего получаем текущего пользователя  и перезаписываем его поля новыми данными
+        Если всё прошло хорошо, то отправляем статус 200
+        иначе статус 400.
+    """
+
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     data = json.load(request)
     new_name = data.get('new_name')
@@ -428,4 +559,5 @@ def rename_profile(request):
             user.save()
             return HttpResponse(status=200)
     else:
+        # user = vk.method("users.get", {"user_ids": 1, "fields": ["photo_max_orig"]})
         return HttpResponse("Ошибка.", status=400, reason='Invalid request')

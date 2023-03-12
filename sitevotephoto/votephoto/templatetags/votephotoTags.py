@@ -1,6 +1,4 @@
-from datetime import datetime, timedelta, timezone
 from django import template
-from django.shortcuts import get_object_or_404
 
 from ..models import *
 
@@ -46,3 +44,12 @@ def CountCommentOnePhotoToMain(photoID):
 def CountComment(photoID):
     countComment = Comment.objects.filter(photo=photoID).count()
     return countComment
+
+@register.simple_tag
+def checking_for_photos(userID):
+    user = User.objects.get(pk=userID)
+    try:
+        checking_url = user.photo_by_user.url
+        return True
+    except:
+        return False

@@ -1,6 +1,10 @@
 {% extends 'votephoto/base.html' %}
 
 {% block content %}
+<!--  Подключаем теги  -->
+    {% load votephotoTags %}
+<!-- Проверяем есть ли фотография в photo_by_user -->
+    {% checking_for_photos user.pk as checking_photo %}
     {% csrf_token %}
     {% if request.user.is_authenticated %}
         <div class="row">
@@ -34,10 +38,17 @@
                     </div>
 
                     <div class="col">
+                        {% if request.user.patronymic != None %}
                         <div class="form-outline">
                             <label class="form-label" for="form7Example2">Отчество:</label>
                             <input type="text" id="form7Example3" class="form-control" value="{{ user.patronymic }}"/>
                         </div>
+                        {% else %}
+                        <div class="form-outline">
+                            <label class="form-label" for="form7Example2">Отчество:</label>
+                            <input type="text" id="form7Example3" class="form-control" value="--"/>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
 
@@ -45,12 +56,18 @@
                     <label class="form-label" for="form7Example3">Почта:</label>
                     <input type="text" id="form7Example4" class="form-control" value="{{ user.email }}"/>
                 </div>
-
-                <div class="form-outline mb-4">
-                    <label class="form-label" for="form7Example5"> Фотография профиля:</label>
-                    <img src="{{ user.photo_by_user.url }}" class="border border-dark">
-                </div>
-
+                {% if checking_photo %}
+                  {% csrf_token %}
+                    <div class="form-outline mb-4">
+                        <label class="form-label" for="form7Example5"> Фотография профиля:</label>
+                        <img src="{{ user.photo_by_user.url }}" class="border border-dark">
+                    </div>
+                {% else %}
+                    <div class="form-outline mb-4">
+                        <label class="form-label" for="form7Example5"> Фотография профиля:</label>
+                        <img src="{{ user.url_photo_by_user_from_VK }}" class="border border-dark">
+                    </div>
+                {% endif %}
                 <div class="form-outline mb-4">
                     <label class="form-label" for="form7Example3">Token: </label>
                     <input type="text" id="form7Example5" class="form-control"/>

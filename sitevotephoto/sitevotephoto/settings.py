@@ -9,8 +9,8 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-from pathlib import Path
 import os.path
+from pathlib import Path
 
 from decouple import config
 
@@ -44,6 +44,10 @@ INSTALLED_APPS = [
     'django_celery_results',
     'rest_framework',
     'rest_framework.authtoken',
+    'social_django',
+    'django_channels_notifications',
+    'channels',
+    'WebSocket',
 ]
 
 REST_FRAMEWORK = {
@@ -83,27 +87,18 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'sitevotephoto.wsgi.application'
-
-# Database
-# https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+ASGI_APPLICATION = 'sitevotephoto.asgi.application'
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'VotePhotoThree',
+        'NAME': 'VotePhotoOne',
         'USER': 'denis',
         'PASSWORD': 'Zxc230104',
         'HOST': 'localhost',
@@ -166,3 +161,31 @@ CELERY_BROKER_URL = config('CELERY_BROKER_REDIS_URL', default='redis://localhost
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
 
 CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+
+# настройка авторизации через вк
+
+SOCIAL_AUTH_POSTGRES_JSONFIELD = True
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.vk.VKOAuth2',  # бекенд авторизации через ВКонтакте
+    'django.contrib.auth.backends.ModelBackend', # бекенд классической аутентификации, чтобы работала авторизация через обычный логин и пароль
+)
+
+SOCIAL_AUTH_VK_OAUTH2_KEY = '51569945'
+SOCIAL_AUTH_VK_OAUTH2_SECRET = 'Ge4nVw99YhSCyR83PI7x'
+
+LOGIN_REDIRECT_URL = '/'
+
+SOCIAL_AUTH_VK_OAUTH2_SCOPE = ['email', 'photos']
+
+# Settings WebSocket
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
+
