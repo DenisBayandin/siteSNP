@@ -36,6 +36,7 @@ def CountCommentOnePhotoToMain(photoID):
     countCommentOnePhoto = Comment.objects.filter(photo=photoID)
     return countCommentOnePhoto[:3]
 
+
 # @register.simple_tag
 # def CountCommentOnePhoto(photoID):
 #     countComment = Comment.objects.filter(photo=photoID).count()
@@ -44,6 +45,7 @@ def CountCommentOnePhotoToMain(photoID):
 def CountComment(photoID):
     countComment = Comment.objects.filter(photo=photoID).count()
     return countComment
+
 
 @register.simple_tag
 def checking_for_photos(userID):
