@@ -2,7 +2,7 @@
 
 {% block content %}
 <!--  Подключаем теги  -->
-    {% load votephotoTags %}
+    {% load votephoto_tags %}
 <!-- Проверяем есть ли фотография в photo_by_user -->
     {% checking_for_photos user.pk as checking_photo %}
     {% csrf_token %}

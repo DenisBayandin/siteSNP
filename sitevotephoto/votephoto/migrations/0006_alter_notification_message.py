@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('votephoto', '0005_notification_sender_alter_notification_recipient'),
+        ("votephoto", "0005_notification_sender_alter_notification_recipient"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='notification',
-            name='message',
+            model_name="notification",
+            name="message",
             field=models.CharField(blank=True, max_length=250, null=True),
         ),
     ]

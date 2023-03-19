@@ -7,18 +7,23 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('votephoto', '0002_alter_user_photo_200'),
+        ("votephoto", "0002_alter_user_photo_200"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='user',
-            old_name='photo_200',
-            new_name='url_photo_by_user_from_VK',
+            model_name="user",
+            old_name="photo_200",
+            new_name="url_photo_by_user_from_VK",
         ),
         migrations.AlterField(
-            model_name='user',
-            name='photo_by_user',
-            field=easy_thumbnails.fields.ThumbnailerImageField(blank=True, null=True, upload_to='photos/%Y/%m/%d', verbose_name='Photo by user'),
+            model_name="user",
+            name="photo_by_user",
+            field=easy_thumbnails.fields.ThumbnailerImageField(
+                blank=True,
+                null=True,
+                upload_to="photos/%Y/%m/%d",
+                verbose_name="Photo by user",
+            ),
         ),
     ]

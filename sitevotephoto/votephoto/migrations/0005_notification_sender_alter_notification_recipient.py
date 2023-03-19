@@ -8,18 +8,32 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('votephoto', '0004_notification'),
+        ("votephoto", "0004_notification"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='notification',
-            name='sender',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='sender', to=settings.AUTH_USER_MODEL, verbose_name='Отправил уведомление'),
+            model_name="notification",
+            name="sender",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="sender",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Отправил уведомление",
+            ),
         ),
         migrations.AlterField(
-            model_name='notification',
-            name='recipient',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='recipient', to=settings.AUTH_USER_MODEL, verbose_name='Получил уведомление'),
+            model_name="notification",
+            name="recipient",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="recipient",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Получил уведомление",
+            ),
         ),
     ]

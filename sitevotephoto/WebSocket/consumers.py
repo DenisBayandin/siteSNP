@@ -25,22 +25,31 @@ def get_photo(photoID):
 
 @database_sync_to_async
 def create_notification(sender, photo, type_websoket):
-    notification = Notification.objects.create(sender=sender)
     if type_websoket == "like":
-        notification.message = f'Пользователь {sender} поставил "Мне нравится"' \
-                               f' фотографии: {photo.name}' \
-                               f'\nОбщее кол-во "Мне нравится" на фотографии: {photo.count_like}'
+        notification = Notification.objects.create(
+            sender=sender,
+            message=(
+                f'Пользователь {sender} поставил "Мне нравится"'
+                f" фотографии: {photo.name}"
+                f'\nОбщее кол-во "Мне нравится" на фотографии: {photo.count_like}'
+            ),
+        )
     elif type_websoket == "delete_like":
-        notification.message = f'Пользователь {sender} убрал "Мне нравится"' \
-                               f'с фотографии: {photo.name}' \
-                               f'\nОбщее кол-во "Мне нравится" на фотографии: {photo.count_like}'
-    notification.save()
+        notification = Notification.objects.create(
+            sender=sender,
+            message=(
+                f'Пользователь {sender} убрал "Мне нравится"'
+                f"с фотографии: {photo.name}"
+                f'\nОбщее кол-во "Мне нравится"'
+                f" на фотографии: {photo.count_like}"
+            ),
+        )
     return notification.message
 
 
 class NotificationConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        get_pk_user_from_url = self.scope['url_route']['kwargs']['user_pk']
+        get_pk_user_from_url = self.scope["url_route"]["kwargs"]["user_pk"]
         user_from_db = await get_user(int(get_pk_user_from_url))
         self.group_name = user_from_db.group_name
         await self.channel_layer.group_add(self.group_name, self.channel_name)
@@ -48,26 +57,20 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
     async def websocket_receive(self, event):
         # TODO для каждого случ. передавать like, comment и через switch case.
-        data = json.loads(event['text'])
-        user = await get_user(int(data['sender']))
-        photo = await get_photo(int(data['photoID']))
+        data = json.loads(event["text"])
+        user = await get_user(int(data["sender"]))
+        photo = await get_photo(int(data["photoID"]))
         user_which_create_photo = await get_user(int(photo.user_id))
         group_user_which_create_photo = user_which_create_photo.group_name
         if user != user_which_create_photo:
             message = await create_notification(user, photo, data["type_websocket"])
-            new_data = {
-                'type': 'send_new_data',
-                'message': message
-            }
-            await self.channel_layer.group_send(
-                group_user_which_create_photo,
-                new_data
-            )
+            new_data = {"type": "send_new_data", "message": message}
+            await self.channel_layer.group_send(group_user_which_create_photo, new_data)
         else:
             return 0
 
     async def send_new_data(self, event):
-        new_new_data = event.get('message')
+        new_new_data = event.get("message")
         await self.send(json.dumps({"message": new_new_data}))
 
     async def disconnect(self, event):
@@ -76,7 +79,4 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
     async def send_notification(self, event):
         breakpoint()
-        await self.send(json.dumps({
-            "type": "websocket.send",
-            "data": event
-        }))
+        await self.send(json.dumps({"type": "websocket.send", "data": event}))

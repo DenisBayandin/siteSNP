@@ -1,13 +1,22 @@
-from channels.layers import get_channel_layer
-from .my_views.admin_view import *
-from.my_views.celery_view import *
-from .my_views.comment_view import *
-from .my_views.like_view import *
-from .my_views.one_photo_view import *
-from .my_views.photo_one_user import *
-from .my_views.photo_view import *
-from .my_views.reg_aut_login_view import *
-from .my_views.rename_view import *
-
-version_vk_api = '5.131'
-channel_layer = get_channel_layer()
+from .myviews.admin_view import (
+    ViewPhotoNotVerified,
+    ViewPhotoUpdate,
+    ViewPhotoDelete,
+    show_photo_admin,
+    show_photo_admin_update,
+    update_state_verified,
+    update_state_not_verified,
+    update_photo,
+)
+from .myviews.celery_view import celery_delete_photo, delete_photo
+from .myviews.comment_view import delete_comment, update_comment
+from .myviews.like_view import add_like
+from .myviews.one_photo_view import (
+    show_one_photo,
+    loading_new_photo,
+    cancel_delete_photo,
+)
+from .myviews.photo_one_user import SortedAllPhotoOneUser
+from .myviews.photo_view import MainView, MainSortedView, MainSearchView, view_all_photo
+from .myviews.reg_aut_login_view import RegisterUser, LoginUser, profile, logout_view
+from .myviews.rename_view import rename_token, rename_profile

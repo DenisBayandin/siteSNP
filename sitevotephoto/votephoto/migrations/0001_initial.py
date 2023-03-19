@@ -14,100 +14,298 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('auth', '0012_alter_user_first_name_max_length'),
+        ("auth", "0012_alter_user_first_name_max_length"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='User',
+            name="User",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('password', models.CharField(max_length=128, verbose_name='password')),
-                ('last_login', models.DateTimeField(blank=True, null=True, verbose_name='last login')),
-                ('is_superuser', models.BooleanField(default=False, help_text='Designates that this user has all permissions without explicitly assigning them.', verbose_name='superuser status')),
-                ('username', models.CharField(error_messages={'unique': 'A user with that username already exists.'}, help_text='Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.', max_length=150, unique=True, validators=[django.contrib.auth.validators.UnicodeUsernameValidator()], verbose_name='username')),
-                ('first_name', models.CharField(blank=True, max_length=150, verbose_name='first name')),
-                ('last_name', models.CharField(blank=True, max_length=150, verbose_name='last name')),
-                ('email', models.EmailField(blank=True, max_length=254, verbose_name='email address')),
-                ('is_staff', models.BooleanField(default=False, help_text='Designates whether the user can log into this admin site.', verbose_name='staff status')),
-                ('is_active', models.BooleanField(default=True, help_text='Designates whether this user should be treated as active. Unselect this instead of deleting accounts.', verbose_name='active')),
-                ('date_joined', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date joined')),
-                ('patronymic', models.CharField(max_length=50, null=True, verbose_name='Отчество')),
-                ('photo_by_user', easy_thumbnails.fields.ThumbnailerImageField(blank=True, upload_to='photos/%Y/%m/%d', verbose_name='Photo by user')),
-                ('date_create', models.DateField(auto_now_add=True)),
-                ('date_update', models.DateTimeField(auto_now=True)),
-                ('photo_200', models.CharField(max_length=255, null=True)),
-                ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.group', verbose_name='groups')),
-                ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_set', related_query_name='user', to='auth.permission', verbose_name='user permissions')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("password", models.CharField(max_length=128, verbose_name="password")),
+                (
+                    "last_login",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="last login"
+                    ),
+                ),
+                (
+                    "is_superuser",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Designates that this user has all permissions without explicitly assigning them.",
+                        verbose_name="superuser status",
+                    ),
+                ),
+                (
+                    "username",
+                    models.CharField(
+                        error_messages={
+                            "unique": "A user with that username already exists."
+                        },
+                        help_text="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
+                        max_length=150,
+                        unique=True,
+                        validators=[
+                            django.contrib.auth.validators.UnicodeUsernameValidator()
+                        ],
+                        verbose_name="username",
+                    ),
+                ),
+                (
+                    "first_name",
+                    models.CharField(
+                        blank=True, max_length=150, verbose_name="first name"
+                    ),
+                ),
+                (
+                    "last_name",
+                    models.CharField(
+                        blank=True, max_length=150, verbose_name="last name"
+                    ),
+                ),
+                (
+                    "email",
+                    models.EmailField(
+                        blank=True, max_length=254, verbose_name="email address"
+                    ),
+                ),
+                (
+                    "is_staff",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Designates whether the user can log into this admin site.",
+                        verbose_name="staff status",
+                    ),
+                ),
+                (
+                    "is_active",
+                    models.BooleanField(
+                        default=True,
+                        help_text="Designates whether this user should be treated as active. Unselect this instead of deleting accounts.",
+                        verbose_name="active",
+                    ),
+                ),
+                (
+                    "date_joined",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now, verbose_name="date joined"
+                    ),
+                ),
+                (
+                    "patronymic",
+                    models.CharField(max_length=50, null=True, verbose_name="Отчество"),
+                ),
+                (
+                    "photo_by_user",
+                    easy_thumbnails.fields.ThumbnailerImageField(
+                        blank=True,
+                        upload_to="photos/%Y/%m/%d",
+                        verbose_name="Photo by user",
+                    ),
+                ),
+                ("date_create", models.DateField(auto_now_add=True)),
+                ("date_update", models.DateTimeField(auto_now=True)),
+                ("photo_200", models.CharField(max_length=255, null=True)),
+                (
+                    "groups",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="The groups this user belongs to. A user will get all permissions granted to each of their groups.",
+                        related_name="user_set",
+                        related_query_name="user",
+                        to="auth.group",
+                        verbose_name="groups",
+                    ),
+                ),
+                (
+                    "user_permissions",
+                    models.ManyToManyField(
+                        blank=True,
+                        help_text="Specific permissions for this user.",
+                        related_name="user_set",
+                        related_query_name="user",
+                        to="auth.permission",
+                        verbose_name="user permissions",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Юзер',
-                'verbose_name_plural': 'Юзеры',
-                'db_table': 'user_votephoto',
+                "verbose_name": "Юзер",
+                "verbose_name_plural": "Юзеры",
+                "db_table": "user_votephoto",
             },
             managers=[
-                ('objects', django.contrib.auth.models.UserManager()),
+                ("objects", django.contrib.auth.models.UserManager()),
             ],
         ),
         migrations.CreateModel(
-            name='Photo',
+            name="Photo",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('content', models.TextField(blank=True)),
-                ('date_create', models.DateTimeField(auto_now_add=True)),
-                ('date_update', models.DateTimeField(auto_now=True)),
-                ('date_delete', models.DateTimeField(null=True)),
-                ('date_now', models.DateTimeField(null=True)),
-                ('info_published', models.BooleanField(default=False, verbose_name='To publish?')),
-                ('modification', models.BooleanField(default=False)),
-                ('photo_delete', models.ImageField(blank=True, null=True, upload_to='delete_photos/%Y/%m/%d')),
-                ('new_photo', models.ImageField(upload_to='new_photos/%Y/%m/%d')),
-                ('old_photo', models.ImageField(blank=True, upload_to='old_photos/%Y/%m/%d')),
-                ('photo_145x165', models.ImageField(blank=True, upload_to='photos_145x165/%Y/%m/%d')),
-                ('photo_510x510', models.ImageField(blank=True, upload_to='photos_510x510/%Y/%m/%d')),
-                ('count_like', models.IntegerField(default=0)),
-                ('count_comment', models.IntegerField(default=0)),
-                ('state', django_fsm.FSMField(default='Not verified', max_length=50, protected=True, verbose_name='Статус фотографии')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("content", models.TextField(blank=True)),
+                ("date_create", models.DateTimeField(auto_now_add=True)),
+                ("date_update", models.DateTimeField(auto_now=True)),
+                ("date_delete", models.DateTimeField(null=True)),
+                ("date_now", models.DateTimeField(null=True)),
+                (
+                    "info_published",
+                    models.BooleanField(default=False, verbose_name="To publish?"),
+                ),
+                ("modification", models.BooleanField(default=False)),
+                (
+                    "photo_delete",
+                    models.ImageField(
+                        blank=True, null=True, upload_to="delete_photos/%Y/%m/%d"
+                    ),
+                ),
+                ("new_photo", models.ImageField(upload_to="new_photos/%Y/%m/%d")),
+                (
+                    "old_photo",
+                    models.ImageField(blank=True, upload_to="old_photos/%Y/%m/%d"),
+                ),
+                (
+                    "photo_145x165",
+                    models.ImageField(blank=True, upload_to="photos_145x165/%Y/%m/%d"),
+                ),
+                (
+                    "photo_510x510",
+                    models.ImageField(blank=True, upload_to="photos_510x510/%Y/%m/%d"),
+                ),
+                ("count_like", models.IntegerField(default=0)),
+                ("count_comment", models.IntegerField(default=0)),
+                (
+                    "state",
+                    django_fsm.FSMField(
+                        default="Not verified",
+                        max_length=50,
+                        protected=True,
+                        verbose_name="Статус фотографии",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Фото',
-                'verbose_name_plural': 'Фотографии',
-                'db_table': 'photo',
-                'ordering': ('-date_create',),
+                "verbose_name": "Фото",
+                "verbose_name_plural": "Фотографии",
+                "db_table": "photo",
+                "ordering": ("-date_create",),
             },
         ),
         migrations.CreateModel(
-            name='Like',
+            name="Like",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('dateCreate', models.DateField(auto_now_add=True, verbose_name='Дата добавления лайка')),
-                ('dateUpdate', models.DateTimeField(auto_now=True, verbose_name='Дата и время когда клайк был обновлён')),
-                ('photo', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='votephoto.photo', verbose_name='Фотография, которая содержит лайк')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='Поставил лайк')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "dateCreate",
+                    models.DateField(
+                        auto_now_add=True, verbose_name="Дата добавления лайка"
+                    ),
+                ),
+                (
+                    "dateUpdate",
+                    models.DateTimeField(
+                        auto_now=True,
+                        verbose_name="Дата и время когда клайк был обновлён",
+                    ),
+                ),
+                (
+                    "photo",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="votephoto.photo",
+                        verbose_name="Фотография, которая содержит лайк",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="Поставил лайк",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Лайк',
-                'verbose_name_plural': 'Лайки',
-                'db_table': 'like',
+                "verbose_name": "Лайк",
+                "verbose_name_plural": "Лайки",
+                "db_table": "like",
             },
         ),
         migrations.CreateModel(
-            name='Comment',
+            name="Comment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('content', models.TextField()),
-                ('dateCreate', models.DateField(auto_now_add=True)),
-                ('dateUpdate', models.DateTimeField(auto_now=True)),
-                ('Parent', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='votephoto.comment')),
-                ('photo', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='votephoto.photo')),
-                ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("content", models.TextField()),
+                ("dateCreate", models.DateField(auto_now_add=True)),
+                ("dateUpdate", models.DateTimeField(auto_now=True)),
+                (
+                    "Parent",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="votephoto.comment",
+                    ),
+                ),
+                (
+                    "photo",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="votephoto.photo",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Комментарий',
-                'verbose_name_plural': 'Комментарии',
-                'db_table': 'comment',
+                "verbose_name": "Комментарий",
+                "verbose_name_plural": "Комментарии",
+                "db_table": "comment",
             },
         ),
     ]

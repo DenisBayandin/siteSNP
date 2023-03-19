@@ -1,7 +1,7 @@
 <div id="postsElem">
     {% for p in photo %}
-<!-- Включаем теги из votephotoTags -->
-    {% load votephotoTags %}
+<!-- Включаем теги из votephoto_tags -->
+    {% load votephoto_tags %}
 <!-- Передаём getAllLikesIsPhoto id фотографии -->
     {% getAllLikesIsPhoto p.pk as likeOnePhoto  %}
 <!-- Передаём TrueAndFalseLikeUserPhoto id юзера и фотографии -->
