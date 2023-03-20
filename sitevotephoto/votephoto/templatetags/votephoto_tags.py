@@ -1,6 +1,6 @@
 from django import template
 
-from ..models import *
+from ..models import User, Photo, Comment, Like
 
 register = template.Library()
 
@@ -46,8 +46,7 @@ def CountComment(photoID):
 @register.simple_tag
 def checking_for_photos(userID):
     user = User.objects.get(pk=userID)
-    try:
-        checking_url = user.photo_by_user.url
+    if user.url_photo_by_user_from_VK is None:
         return True
-    except:
+    else:
         return False

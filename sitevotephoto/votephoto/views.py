@@ -16,7 +16,7 @@ from .myviews.one_photo_view import (
     loading_new_photo,
     cancel_delete_photo,
 )
-from .myviews.photo_one_user import SortedAllPhotoOneUser
-from .myviews.photo_view import MainView, MainSortedView, MainSearchView, view_all_photo
+from .myviews.photo_one_user import SortedAllPhotoOneUser, view_all_photo
+from .myviews.photo_view import MainView, MainSortedView, MainSearchView
 from .myviews.reg_aut_login_view import RegisterUser, LoginUser, profile, logout_view
 from .myviews.rename_view import rename_token, rename_profile

@@ -1,10 +1,12 @@
 from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
+from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from channels.layers import get_channel_layer
 
 from ..forms import AddComment, AddNewPhotoForm
 from ..models import Comment, Photo, User, Notification
+from .rename_lifetime_token import rename_lifetime_token_vk
 
 channel_layer = get_channel_layer()
 
@@ -21,6 +23,9 @@ def show_one_photo(request, photoID):
      комментарий к фотографии.
     Уведомление получает создать фотографии.
     """
+    if request.user != AnonymousUser():
+        if rename_lifetime_token_vk(request, request.user):
+            return redirect("login")
     comment_show = Comment.objects.filter(photo=photoID, Parent=None)
     commentChildren_show = Comment.objects.exclude(Parent=None).filter(photo=photoID)
     try:

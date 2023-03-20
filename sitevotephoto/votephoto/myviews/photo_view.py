@@ -1,5 +1,4 @@
 from django.db.models import Q
-from django.shortcuts import render
 from django.views.generic import ListView
 
 from ..models import User, Photo
@@ -73,15 +72,3 @@ class MainSearchView(ListView):
         else:
             self.queryset = None
         return super().get_queryset()
-
-
-def view_all_photo(request):
-    # TODO Функция показа всех фотографий одного пользователя.
-    """
-    Все фотографии одного пользователя.
-    Получаем фотографии текущего пользователя.
-    """
-
-    photos = Photo.objects.filter(user=request.user)
-    context = {"title": f"Фотографии {request.user.username}-a", "photo": photos}
-    return render(request, "votephoto/allPhotoOneUser.html", context)

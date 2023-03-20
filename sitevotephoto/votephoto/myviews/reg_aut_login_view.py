@@ -1,15 +1,13 @@
-from datetime import timedelta
-
 import vk
 from django.contrib.auth import login
 from django.contrib.auth import logout
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, render
-from django.utils import timezone
 from django.views.generic import CreateView
 from rest_framework.authtoken.models import Token
 
 from ..forms import RegisterUsersForm, LoginUsersForm, AddPhotoForm
+from .rename_lifetime_token import rename_lifetime_token_vk
 
 version_vk_api = "5.131"
 
@@ -63,23 +61,16 @@ def profile(request):
      в вк и записываем её url
     в url_photo_by_user_from_VK.
     """
+    if rename_lifetime_token_vk(request, request.user):
+        return redirect("login")
     try:
         token = Token.objects.get(user=request.user.pk)
     except:
         token = Token.objects.create(user=request.user)
         token.save()
     user = request.user
-    try:
-        photo_user = user.photo_by_user.url
-    except:
+    if user.photo_by_user.name == "":
         social = user.social_auth.get(provider="vk-oauth2")
-        time_life_token = social.extra_data["expires"]
-        time_create_token = social.created
-        if time_create_token + timedelta(seconds=time_life_token) < timezone.now():
-            social.created = social.modified
-            social.save()
-            logout(request)
-            return redirect("login")
         token = social.extra_data["access_token"]
         api = vk.API(access_token=token, v=version_vk_api)
         json_vk = api.users.get(fields="photo_200")
