@@ -9,7 +9,7 @@ class Comment(models.Model):
     dateCreate = models.DateField(auto_now_add=True)
     dateUpdate = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
-    photo = models.ForeignKey(Photo, on_delete=models.CASCADE)
+    photo = models.ForeignKey(Photo, on_delete=models.CASCADE, null=True)
     Parent = models.ForeignKey("self", on_delete=models.PROTECT, null=True)
 
     def get_absolute_url(self):

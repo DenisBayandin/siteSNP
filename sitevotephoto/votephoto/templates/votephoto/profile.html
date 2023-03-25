@@ -8,89 +8,89 @@
     {% csrf_token %}
     {% if request.user.is_authenticated %}
         <div class="row">
-          <div class="col-md-8 mb-4">
-            <div class="card mb-4">
-              <div class="card-header py-3">
-                <h5 class="mb-0">Профиль {{ user.username }}-a</h5>
-              </div>
-              <div class="card-body">
-              <!-- 2 column grid layout with text inputs for the first and last names -->
-
-                <div class="form-outline mb-4">
-                    <label class="form-label" for="form7Example3">Ник:</label>
-                    <input type="text" id="form7Example0" class="form-control" value="{{ user.username }}"/>
-                </div>
-
-                <div class="row mb-4">
-
-                    <div class="col">
-                        <div class="form-outline">
-                            <label class="form-label" for="form7Example1">Фамилия:</label>
-                            <input type="text" id="form7Example1" class="form-control" value="{{ user.last_name }}"/>
-                        </div>
+            <div class="col-md-8 mb-4">
+                <div class="card mb-4">
+                    <div class="card-header py-3">
+                        <h5 class="mb-0">Профиль {{ user.username }}-a</h5>
                     </div>
+                    <div class="card-body">
+                    <!-- 2 column grid layout with text inputs for the first and last names -->
 
-                    <div class="col">
-                        <div class="form-outline">
-                            <label class="form-label" for="form7Example2">Имя:</label>
-                            <input type="text" id="form7Example2" class="form-control" value="{{ user.first_name }}"/>
+                        <div class="form-outline mb-4">
+                            <label class="form-label" for="form7Example3">Ник:</label>
+                            <input type="text" id="form7Example0" class="form-control" value="{{ user.username }}"/>
                         </div>
-                    </div>
 
-                    <div class="col">
-                        {% if request.user.patronymic != None %}
-                        <div class="form-outline">
-                            <label class="form-label" for="form7Example2">Отчество:</label>
-                            <input type="text" id="form7Example3" class="form-control" value="{{ user.patronymic }}"/>
+                        <div class="row mb-4">
+
+                            <div class="col">
+                                <div class="form-outline">
+                                    <label class="form-label" for="form7Example1">Фамилия:</label>
+                                    <input type="text" id="form7Example1" class="form-control" value="{{ user.last_name }}"/>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="form-outline">
+                                    <label class="form-label" for="form7Example2">Имя:</label>
+                                    <input type="text" id="form7Example2" class="form-control" value="{{ user.first_name }}"/>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                {% if request.user.patronymic != None %}
+                                    <div class="form-outline">
+                                        <label class="form-label" for="form7Example2">Отчество:</label>
+                                        <input type="text" id="form7Example3" class="form-control" value="{{ user.patronymic }}"/>
+                                    </div>
+                                {% else %}
+                                    <div class="form-outline">
+                                        <label class="form-label" for="form7Example2">Отчество:</label>
+                                        <input type="text" id="form7Example3" class="form-control" value="--"/>
+                                    </div>
+                                {% endif %}
+                            </div>
                         </div>
+
+                        <div class="form-outline mb-4">
+                            <label class="form-label" for="form7Example3">Почта:</label>
+                            <input type="text" id="form7Example4" class="form-control" value="{{ user.email }}"/>
+                        </div>
+
+                        {% if checking_photo %}
+                            {% csrf_token %}
+                            <div class="form-outline mb-4">
+                                <label class="form-label" for="form7Example5"> Фотография профиля:</label>
+                                <img src="{{ user.photo_by_user.url }}" class="border border-dark">
+                            </div>
                         {% else %}
-                        <div class="form-outline">
-                            <label class="form-label" for="form7Example2">Отчество:</label>
-                            <input type="text" id="form7Example3" class="form-control" value="--"/>
-                        </div>
+                            <div class="form-outline mb-4">
+                                <label class="form-label" for="form7Example5"> Фотография профиля:</label>
+                                <img src="{{ user.url_photo_by_user_from_VK }}" class="border border-dark">
+                            </div>
                         {% endif %}
-                    </div>
-                </div>
 
-                <div class="form-outline mb-4">
-                    <label class="form-label" for="form7Example3">Почта:</label>
-                    <input type="text" id="form7Example4" class="form-control" value="{{ user.email }}"/>
-                </div>
-                {% if checking_photo %}
-                  {% csrf_token %}
-                    <div class="form-outline mb-4">
-                        <label class="form-label" for="form7Example5"> Фотография профиля:</label>
-                        <img src="{{ user.photo_by_user.url }}" class="border border-dark">
+                        <div class="form-outline mb-4">
+                            <label class="form-label" for="form7Example3">Token: </label>
+                            <input type="text" id="form7Example5" class="form-control"/>
+                            <br>
+                            <button class="btn btn-dark"
+                            id = "get_token_button"
+                            onclick="set_token_in_input('{{ token }}')">Получить token</button>
+                            <button onclick="rename_and_set_token()" class="btn btn-dark">Сгенерировать token</button>
+                            <button class="btn btn-dark" onclick="rename_profile()">Изменить данные профиля</button>
+                        </div>
                     </div>
-                {% else %}
-                    <div class="form-outline mb-4">
-                        <label class="form-label" for="form7Example5"> Фотография профиля:</label>
-                        <img src="{{ user.url_photo_by_user_from_VK }}" class="border border-dark">
-                    </div>
-                {% endif %}
-                <div class="form-outline mb-4">
-                    <label class="form-label" for="form7Example3">Token: </label>
-                    <input type="text" id="form7Example5" class="form-control"/>
-                    <br>
-                    <button class="btn btn-dark"
-                               id = "get_token_button"
-                               onclick="set_token_in_input('{{ token }}')">Получить token</button>
-                    <button onclick="rename_and_set_token()" class="btn btn-dark">Сгенерировать token</button>
-                    <button class="btn btn-dark" onclick="rename_profile()">Изменить данные профиля</button>
                 </div>
-
             </div>
-        </div>
-    </div>
-        <h5>Добавьте фотографию.</h5>
-        <form action="{% url 'profile' %}" method="post" enctype="multipart/form-data">
 
-        {% csrf_token %}
-        {{ form.as_p }}
+            <h5>Добавьте фотографию.</h5>
 
-        <button type="submit" class="btn btn-dark"> Сохранить </button>
-
-        </form>
+            <form action="{% url 'profile' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-dark"> Сохранить </button>
+            </form>
     {% else %}
         <h1> Вы не авторизованы, войдите в профиль. </h1>
         <br>

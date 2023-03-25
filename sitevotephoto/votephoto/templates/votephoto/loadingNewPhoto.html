@@ -3,7 +3,7 @@
 {% block content %}
     <h1>{{ title }}</h1>
     <br>
-    <div class="fs-3">Текущая данные фотографии:</div>
+    <div class="fs-3">Текущие данные фотографии:</div>
     <img src="{{photo.photo_510x510.url}}">
     <br><br>
     <form method="post" enctype="multipart/form-data" action="{% url 'loading_new_photo' photo.pk %}" id="form">

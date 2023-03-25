@@ -33,14 +33,10 @@
         var socket = new WebSocket(urlSocket);
         let _this = this;
         socket.onmessage = function(event){
-<!--            _this.coins = JSON.parse(event.data);-->
-<!--            console.log(_this.coins);-->
-<!--            alert(_this.coins);-->
             let message = event.data;
             message = JSON.parse(message);
             console.log(message["message"]);
             alert(message["message"]);
         };
     </script>
-
 </html>

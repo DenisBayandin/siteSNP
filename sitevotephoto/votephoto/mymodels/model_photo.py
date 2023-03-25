@@ -97,7 +97,6 @@ class Photo(models.Model):
             output.__sizeof__(),
             None,
         )
-        super(Photo, self).save(*args, **kwargs)
 
         image.thumbnail((145, 165), Img.ANTIALIAS)
         output = BytesIO()

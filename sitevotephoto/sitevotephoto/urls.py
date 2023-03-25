@@ -7,6 +7,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("votephoto.urls")),
     path("login/vk/", include("social_django.urls")),
+    path("api/", include("votephoto.api.url.urls")),
 ]
 
 if settings.DEBUG:
