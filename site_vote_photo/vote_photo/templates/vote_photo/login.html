@@ -1,0 +1,15 @@
+{% extends 'vote_photo/base.html' %}
+
+{% block content %}
+    <h1> {{ title }} </h1>
+    <br>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-dark"> Войти </button>
+    </form>
+    <br>
+    <a href="vk/login/vk-oauth2"><img src="https://simg.nicepng.com/png/small/207-2078675_vk-logo-vk-icon-android.png" class="avatar-3" data-toggle="tooltip"
+    height="50" width="50"></a>
+
+{% endblock %}

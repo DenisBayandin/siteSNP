@@ -1,0 +1,34 @@
+{% extends "admin/base.html" %}
+
+{% block branding %}
+    <a href="/admin/"><h1>Модерирование сайта VotePhoto</h1></a>
+{% endblock %}
+
+{% block extrastyle %}{% endblock %}
+
+{% block coltype %}{% endblock %}
+
+{% block bodyclass %}{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block nav-sidebar %}{% endblock %}
+
+{% block content %}
+    <div>Старая фотография (фотография которую хотят заменить):<br><img src="{{ photo.photo_510x510.url }}" style="margin-bottom: 10px;"><br><br>
+    Новая фотография (фотография на которую хотят заменить):<br><img src="{{ photo.new_photo.url }}" width="510" height="319"></div>
+    <h2>Имя фотографии: {{ photo.name }}</h2>
+    <h2>Описание фотографии: {{ photo.content }}</h2>
+    <p>
+        <form method="post" action="{% url 'updatePhotoInAdmin' photo.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-light">Заменить фотографию</button>
+        </form>
+    </p>
+    <p>
+        <form method="post" action="{% url 'updateStateNotVerified' photo.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-light">Фотография не прошла проверку</button>
+        </form>
+    </p>
+{% endblock %}
