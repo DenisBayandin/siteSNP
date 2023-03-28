@@ -22,3 +22,15 @@ class LoadPhotoSerializers(serializers.ModelSerializer):
     class Meta:
         model = Photo
         fields = ["id", "name", "content", "old_photo", "user"]
+
+
+class UpdatePhotoYesPhotoSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Photo
+        fields = ["name", "content", "new_photo"]
+
+
+class UpdatePhotoNoPhotoSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Photo
+        fields = ["name", "content", "old_photo"]
