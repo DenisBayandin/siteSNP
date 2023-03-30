@@ -15,7 +15,7 @@ from ..view.comment_view import (
     CreateCommentOnePhotoView,
     СhangeOneCommentView,
 )
-from ..view.like_view import LikesView, OneLikeView
+from ..view.like_view import AllLikesOnePhotoView, CreateLikeView, ChangeLikeView
 from ..view.user_view import UsersView, DetailUser
 from ..view.refresh_token_view import RefreshTokenView
 
@@ -25,8 +25,6 @@ urlpatterns = [
     path("photos/verified_photo/", AllPhotoWithStateVerifiedView.as_view()),
     path("photos/one_photo/<int:photo_id>/", GetOnePhotoView.as_view()),
     path("photos/one_photo/change/<int:id>/", СhangeOnePhotoView.as_view()),
-    path("photos/<int:photo_id>/likes/", LikesView.as_view()),
-    path("likes/one_like/<int:like_id>/", OneLikeView.as_view()),
     path("users/", UsersView.as_view()),
     path("users/one_user/<int:user_id>/", DetailUser.as_view()),
     path("login/", obtain_auth_token),
@@ -38,6 +36,9 @@ urlpatterns = [
     ),
     path("comments/view_all_comment/<int:photo_id>/", AllCommentOnePhotoView.as_view()),
     path("comments/view_one_comment/<int:comment_id>/", OneCommentView.as_view()),
+    path("likes/all_likes/photo/<int:photo_id>/", AllLikesOnePhotoView.as_view()),
+    path("likes/create_like/photo/<int:photo_id>/", CreateLikeView.as_view()),
+    path("likes/change_like/photo/<int:photo_id>/", ChangeLikeView.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

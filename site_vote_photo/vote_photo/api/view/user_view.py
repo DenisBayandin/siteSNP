@@ -1,11 +1,16 @@
 from django.shortcuts import get_object_or_404
+from django.utils.datastructures import MultiValueDictKeyError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
+from django.core.exceptions import ValidationError
 
-
-from ..serializers.user_serializers import UserRegisterSerializers, UserSerializers
+from ..serializers.user_serializers import (
+    UserRegisterSerializers,
+    UserSerializers,
+    ChangeUserYesPassword,
+)
 from vote_photo.mymodels.model_user import User
 
 
@@ -38,15 +43,53 @@ class DetailUser(APIView):
 
     def put(self, request, user_id, format=None):
         user = self.get_objects(user_id)
-        serializers = UserSerializers(user, data=request.data)
-        if serializers.is_valid():
-            serializers.save()
-            return Response(serializers.data)
-        return Response(serializers.errors)
+        if request.user.id != user_id:
+            try:
+                raise PermissionError(
+                    f"У {request.user} нет полномочий изменять юзера '{user}'."
+                )
+            except PermissionError:
+                return Response(
+                    f"У {request.user} нет полномочий изменять юзера '{user}'.",
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        else:
+            try:
+                old_password = request.data["password"]
+                serializers = ChangeUserYesPassword(
+                    data=(
+                        request.data.dict()
+                        | {"token": Token.objects.get(user=request.user.id).key}
+                    )
+                )
+            except MultiValueDictKeyError:
+                serializers = UserSerializers(user, data=request.data)
+            if serializers.is_valid():
+                try:
+                    # breakpoint()
+                    serializers.update(user, validated_data=request.data)
+                except ValidationError:
+                    return Response(
+                        "Введённые данные некорректны.",
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+                return Response(serializers.data)
+            return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, user_id, format=None):
         user = self.get_objects(user_id)
-        token = Token.objects.get(user_id=user_id)
-        token.delete()
-        user.delete()
-        return Response(status.HTTP_204_NO_CONTENT)
+        if request.user.id != user_id:
+            try:
+                raise PermissionError(
+                    f"У {request.user} нет полномочий удалять юзера '{user}'."
+                )
+            except PermissionError:
+                return Response(
+                    f"У {request.user} нет полномочий удалять юзера '{user}'.",
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        else:
+            token = Token.objects.get(user_id=user_id)
+            token.delete()
+            user.delete()
+            return Response(status.HTTP_204_NO_CONTENT)
