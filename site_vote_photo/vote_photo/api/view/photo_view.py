@@ -17,9 +17,6 @@ from ..serializers.photo_serializers import (
 )
 
 
-# from site_vote_photo.vote_photo.mymodels.model_photo import Photo
-
-
 class AllPhotoView(APIView):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
@@ -27,7 +24,7 @@ class AllPhotoView(APIView):
     def get(self, request, format=None):
         photo = Photo.objects.all()
         serializers = AllPhotoSerializers(photo, many=True)
-        return Response(serializers.data)
+        return Response(serializers.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         serializer = LoadPhotoSerializers(
@@ -35,8 +32,8 @@ class AllPhotoView(APIView):
         )
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class СhangeOnePhotoView(APIView):
@@ -55,7 +52,7 @@ class СhangeOnePhotoView(APIView):
     def get(self, request, id, format=None):
         photo = self.get_objects(id)
         serializers = AllPhotoSerializers(photo)
-        return Response(serializers.data)
+        return Response(serializers.data, status=status.HTTP_200_OK)
 
     def put(self, request, id, format=None):
         photo = self.get_objects(id)
@@ -68,8 +65,8 @@ class СhangeOnePhotoView(APIView):
             if serializers.is_valid():
                 serializers.save()
                 self.update_state(id)
-                return Response(serializers.data)
-            return Response(serializers.errors)
+                return Response(serializers.data, status=status.HTTP_200_OK)
+            return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
             raise PermissionError(
                 f"У {request.user} нет полномочий изменять данную фотографию."
@@ -81,10 +78,14 @@ class СhangeOnePhotoView(APIView):
             serializers = AllPhotoSerializers(photo)
             photo.go_state_photo_delete()
             photo.save()
-            return Response(serializers.data)
+            return Response(serializers.data, status=status.HTTP_204_NO_CONTENT)
         else:
-            raise PermissionError(
-                f"У {request.user} нет полномочий удалять данную фотографию."
+            return Response(
+                {
+                    "error": f"У {request.user} нет полномочий удалять данную фотографию.",
+                    "status": status.HTTP_400_BAD_REQUEST,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
 
@@ -104,20 +105,23 @@ class PhotosUserFilter(APIView):
             photos = Photo.objects.filter(state=filters[filter], user=request.user)
         except KeyError:
             return Response(
-                "Введите другой фильтр, доступные фильтры: "
-                "1) verified 2) not_verified 3) update "
-                "4) delete 5) on_check. Пример запроса: .../api/user/photos/verified/",
-                status=404,
+                {
+                    "error": "Введите другой фильтр, доступные фильтры: "
+                    "1) verified 2) not_verified 3) update "
+                    "4) delete 5) on_check. Пример запроса: .../api/user/photos/verified/",
+                    "status": status.HTTP_404_NOT_FOUND,
+                },
+                status=status.HTTP_404_NOT_FOUND,
             )
         serializers = AllPhotoSerializers(photos, many=True)
-        return Response(serializers.data)
+        return Response(serializers.data, status=status.HTTP_200_OK)
 
 
 class AllPhotoWithStateVerifiedView(APIView):
     def get(self, request, format=None):
         photo = Photo.objects.filter(state="Verified")
         serializers = AllPhotoSerializers(photo, many=True)
-        return Response(serializers.data)
+        return Response(serializers.data, status=status.HTTP_200_OK)
 
 
 class GetOnePhotoView(APIView):
@@ -127,4 +131,4 @@ class GetOnePhotoView(APIView):
     def get(self, request, photo_id, format=None):
         photo = self.get_objects(photo_id)
         serializers = AllPhotoSerializers(photo)
-        return Response(serializers.data)
+        return Response(serializers.data, status=status.HTTP_200_OK)

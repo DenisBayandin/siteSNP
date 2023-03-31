@@ -18,6 +18,7 @@ from ..view.comment_view import (
 from ..view.like_view import AllLikesOnePhotoView, CreateLikeView, ChangeLikeView
 from ..view.user_view import UsersView, DetailUser
 from ..view.refresh_token_view import RefreshTokenView
+from ..view.admin_view import AdminChangingStatePhotoView
 
 
 urlpatterns = [
@@ -39,6 +40,10 @@ urlpatterns = [
     path("likes/all_likes/photo/<int:photo_id>/", AllLikesOnePhotoView.as_view()),
     path("likes/create_like/photo/<int:photo_id>/", CreateLikeView.as_view()),
     path("likes/change_like/photo/<int:photo_id>/", ChangeLikeView.as_view()),
+    path(
+        "admin/changing_state/<str:state>/<int:photo_id>/",
+        AdminChangingStatePhotoView.as_view(),
+    ),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

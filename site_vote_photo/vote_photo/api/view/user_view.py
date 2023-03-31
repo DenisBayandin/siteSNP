@@ -1,5 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.utils.datastructures import MultiValueDictKeyError
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -18,7 +20,7 @@ class UsersView(APIView):
     def get(self, request, format=None):
         users = User.objects.all()
         serializers = UserSerializers(users, many=True)
-        return Response(serializers.data)
+        return Response(serializers.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         serializers = UserRegisterSerializers(data=request.data)
@@ -28,18 +30,21 @@ class UsersView(APIView):
             Token.objects.create(
                 user_id=User.objects.get(username=request.data["username"]).id
             )
-            return Response(serializers.data)
-        return Response(serializers.errors)
+            return Response(serializers.data, status=status.HTTP_200_OK)
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class DetailUser(APIView):
+    permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+
     def get_objects(self, user_id):
         return get_object_or_404(User, id=user_id)
 
     def get(self, request, user_id, format=None):
         user = self.get_objects(user_id)
         serializers = UserSerializers(user)
-        return Response(serializers.data)
+        return Response(serializers.data, status=status.HTTP_200_OK)
 
     def put(self, request, user_id, format=None):
         user = self.get_objects(user_id)
@@ -50,7 +55,10 @@ class DetailUser(APIView):
                 )
             except PermissionError:
                 return Response(
-                    f"У {request.user} нет полномочий изменять юзера '{user}'.",
+                    {
+                        "error": f"У {request.user} нет полномочий изменять юзера '{user}'.",
+                        "status": status.HTTP_400_BAD_REQUEST,
+                    },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         else:
@@ -70,10 +78,13 @@ class DetailUser(APIView):
                     serializers.update(user, validated_data=request.data)
                 except ValidationError:
                     return Response(
-                        "Введённые данные некорректны.",
+                        {
+                            "error": "Введённые данные некорректны.",
+                            "status": status.HTTP_400_BAD_REQUEST,
+                        },
                         status=status.HTTP_400_BAD_REQUEST,
                     )
-                return Response(serializers.data)
+                return Response(serializers.data, status=status.HTTP_200_OK)
             return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, user_id, format=None):
@@ -85,11 +96,17 @@ class DetailUser(APIView):
                 )
             except PermissionError:
                 return Response(
-                    f"У {request.user} нет полномочий удалять юзера '{user}'.",
+                    {
+                        "error": f"У {request.user} нет полномочий удалять юзера '{user}'.",
+                        "status": status.HTTP_400_BAD_REQUEST,
+                    },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         else:
             token = Token.objects.get(user_id=user_id)
             token.delete()
             user.delete()
-            return Response(status.HTTP_204_NO_CONTENT)
+            return Response(
+                {"status": status.HTTP_204_NO_CONTENT},
+                status=status.HTTP_204_NO_CONTENT,
+            )

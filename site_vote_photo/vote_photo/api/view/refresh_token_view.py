@@ -3,6 +3,7 @@ from django.contrib.auth.hashers import check_password
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
+from rest_framework import status
 
 from vote_photo.mymodels.model_user import User
 
@@ -17,13 +18,20 @@ class RefreshTokenView(APIView):
                 raise ValidationError("Не верный пароль.")
         except ObjectDoesNotExist:
             return Response(
-                "Не найден пользователь, введите корректный username", status=404
+                {
+                    "error": "Не найден пользователь, введите корректный username",
+                    "status": status.HTTP_404_NOT_FOUND,
+                },
+                status=status.HTTP_404_NOT_FOUND,
             )
         except ValidationError:
             return Response(
-                f"Не верный пароль {request.data['password']}."
-                f" Попробуйте ввести другой пароль.",
-                status=401,
+                {
+                    "error": f"Не верный пароль {request.data['password']}."
+                    f" Попробуйте ввести другой пароль.",
+                    "status": status.HTTP_400_BAD_REQUEST,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
             )
         try:
             token = Token.objects.get(
@@ -31,7 +39,11 @@ class RefreshTokenView(APIView):
             )
         except ObjectDoesNotExist:
             return Response(
-                f"Объект для {request.data['username']} не найден.", status=404
+                {
+                    "error": f"Token для {request.data['username']} не найден.",
+                    "status": status.HTTP_404_NOT_FOUND,
+                },
+                status=404,
             )
         token.delete()
         return Response(
@@ -40,5 +52,7 @@ class RefreshTokenView(APIView):
                     user=User.objects.get(username=request.data["username"])
                 ).key,
                 "username": request.data["username"],
-            }
+                "status": status.HTTP_200_OK,
+            },
+            status=status.HTTP_200_OK,
         )

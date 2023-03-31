@@ -14,7 +14,7 @@ class AllCommentOnePhotoView(APIView):
     def get(self, request, photo_id, format=None):
         comment = Comment.objects.filter(photo_id=photo_id)
         serializers = CommentSerializers(comment, many=True)
-        return Response(serializers.data)
+        return Response(serializers.data, status=status.HTTP_200_OK)
 
 
 class OneCommentView(APIView):
@@ -24,7 +24,7 @@ class OneCommentView(APIView):
     def get(self, request, comment_id, format=None):
         comment = self.get_objects(comment_id)
         serializers = CommentSerializers(comment)
-        return Response(serializers.data)
+        return Response(serializers.data, status=status.HTTP_200_OK)
 
 
 class CreateCommentOnePhotoView(APIView):
@@ -37,8 +37,8 @@ class CreateCommentOnePhotoView(APIView):
         )
         if serializers.is_valid():
             serializers.save()
-            return Response(serializers.data)
-        return Response(serializers.data, status=400)
+            return Response(serializers.data, status=status.HTTP_200_OK)
+        return Response(serializers.data, status=status.HTTP_400_BAD_REQUEST)
 
 
 class СhangeOneCommentView(APIView):
@@ -60,12 +60,15 @@ class СhangeOneCommentView(APIView):
             serializers = CommentSerializers(comment, data=request.data)
             if serializers.is_valid():
                 serializers.save()
-                return Response(serializers.data)
-            return Response(serializers.errors, status=401)
+                return Response(serializers.data, status=status.HTTP_200_OK)
+            return Response(serializers.errors, status=status.HTTP_401_UNAUTHORIZED)
         else:
             return Response(
-                f"У {request.user} нет полномочий производить какие-то"
-                f" манипуляции с данным комментарием.",
+                {
+                    "error": f"У {request.user} нет полномочий производить какие-то"
+                    f" манипуляции с данным комментарием.",
+                    "status": status.HTTP_400_BAD_REQUEST,
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -74,13 +77,21 @@ class СhangeOneCommentView(APIView):
             comment = self.get_objects(comment_id)
             if not self.verification_of_credentials(request, comment):
                 return Response(
-                    f"У {request.user} нет полномочий производить какие-то"
-                    f" манипуляции с данным комментарием.",
+                    {
+                        "error": f"У {request.user} нет полномочий производить какие-то"
+                        f" манипуляции с данным комментарием.",
+                        "status": status.HTTP_400_BAD_REQUEST,
+                    },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             comment.delete()
         except models.ProtectedError:
             return Response(
-                "Невозможно удалить комментарий. Так как на данный коментарий есть ответы."
+                {
+                    "error": "Невозможно удалить комментарий. "
+                    "Так как на данный коментарий есть ответы.",
+                    "status": status.HTTP_400_BAD_REQUEST,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
             )
         return Response(status=status.HTTP_204_NO_CONTENT)
