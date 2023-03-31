@@ -31,7 +31,7 @@ class CreateCommentOnePhotoView(APIView):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
-    def post(self, request, photo_id, *args, **kwargs):
+    def post(self, request, photo_id, format=None, *args, **kwargs):
         serializers = CommentSerializers(
             data=(request.data.dict() | {"photo": photo_id, "user": request.user.id})
         )

@@ -1,10 +1,12 @@
 from django.urls import path
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.urlpatterns import format_suffix_patterns
+from rest_framework import permissions
 
 from ..view.photo_view import (
     AllPhotoView,
-    AllPhotoWithStateVerifiedView,
     СhangeOnePhotoView,
     PhotosUserFilter,
     GetOnePhotoView,
@@ -20,10 +22,19 @@ from ..view.user_view import UsersView, DetailUser
 from ..view.refresh_token_view import RefreshTokenView
 from ..view.admin_view import AdminChangingStatePhotoView
 
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Vote Photo API",
+        default_version="v1",
+        description="API for the website VotePhoto",
+        license=openapi.License(name="BSD License"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
 
 urlpatterns = [
     path("photos/", AllPhotoView.as_view()),
-    path("photos/verified_photo/", AllPhotoWithStateVerifiedView.as_view()),
     path("photos/one_photo/<int:photo_id>/", GetOnePhotoView.as_view()),
     path("photos/one_photo/change/<int:id>/", СhangeOnePhotoView.as_view()),
     path("users/", UsersView.as_view()),
@@ -43,6 +54,11 @@ urlpatterns = [
     path(
         "admin/changing_state/<str:state>/<int:photo_id>/",
         AdminChangingStatePhotoView.as_view(),
+    ),
+    path(
+        "swagger/",
+        schema_view.with_ui("swagger", cache_timeout=0),
+        name="schema-swagger-ui",
     ),
 ]
 

@@ -22,7 +22,7 @@ class CreateLikeView(APIView):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
-    def post(self, request, photo_id, *args, **kwargs):
+    def post(self, request, photo_id, format=None, *args, **kwargs):
         try:
             like = Like.objects.get(photo=photo_id, user=request.user)
         except ObjectDoesNotExist:

@@ -23,7 +23,7 @@ class AdminChangingStatePhotoView(APIView):
         serializers = AllPhotoSerializers(photo)
         return Response(serializers.data, status=status.HTTP_200_OK)
 
-    def put(self, request, photo_id, state, *args, **kwargs):
+    def put(self, request, photo_id, state, format=None, *args, **kwargs):
         photo = self.get_objects(photo_id)
         try:
             if state == "not_verified":

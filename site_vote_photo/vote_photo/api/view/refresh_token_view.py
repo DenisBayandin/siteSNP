@@ -9,7 +9,7 @@ from vote_photo.mymodels.model_user import User
 
 
 class RefreshTokenView(APIView):
-    def post(self, request, format=None):
+    def put(self, request, format=None):
         try:
             user = User.objects.get(username=request.data["username"])
             if check_password(request.data["password"], user.password):

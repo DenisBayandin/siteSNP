@@ -22,7 +22,7 @@ class UsersView(APIView):
         serializers = UserSerializers(users, many=True)
         return Response(serializers.data, status=status.HTTP_200_OK)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, format=None, *args, **kwargs):
         serializers = UserRegisterSerializers(data=request.data)
         if serializers.is_valid():
             serializers.save()

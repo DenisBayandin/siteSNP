@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "django_channels_notifications",
     "channels",
     "web_socket",
+    "drf_yasg",
 ]
 
 REST_FRAMEWORK = {
@@ -189,4 +190,12 @@ CHANNEL_LAYERS = {
             "hosts": [("127.0.0.1", 6379)],
         },
     },
+}
+
+# Settings swagger
+SWAGGER_SETTINGS = {
+    "SECURITY_DEFINITIONS": {
+        "api_key": {"type": "apiKey", "in": "header", "name": "Authorization"}
+    },
+    "LOGOUT_URL": "rest_framework:logout",
 }

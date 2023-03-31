@@ -21,12 +21,12 @@ class AllPhotoView(APIView):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
-    def get(self, request, format=None):
-        photo = Photo.objects.all()
+    def get(self, request):
+        photo = Photo.objects.filter(state="Verified")
         serializers = AllPhotoSerializers(photo, many=True)
         return Response(serializers.data, status=status.HTTP_200_OK)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, format=None, *args, **kwargs):
         serializer = LoadPhotoSerializers(
             data=(request.data.dict() | {"user": request.user.id})
         )
@@ -114,13 +114,6 @@ class PhotosUserFilter(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
         serializers = AllPhotoSerializers(photos, many=True)
-        return Response(serializers.data, status=status.HTTP_200_OK)
-
-
-class AllPhotoWithStateVerifiedView(APIView):
-    def get(self, request, format=None):
-        photo = Photo.objects.filter(state="Verified")
-        serializers = AllPhotoSerializers(photo, many=True)
         return Response(serializers.data, status=status.HTTP_200_OK)
 
 
