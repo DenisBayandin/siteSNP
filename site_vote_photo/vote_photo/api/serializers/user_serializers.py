@@ -8,6 +8,9 @@ from rest_framework.authtoken.models import Token
 
 class UserRegisterSerializers(serializers.ModelSerializer):
     password2 = serializers.CharField()
+    first_name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
+    email = serializers.CharField(required=True)
 
     class Meta:
         model = User
@@ -43,6 +46,8 @@ class UserRegisterSerializers(serializers.ModelSerializer):
 
 
 class UserSerializers(serializers.ModelSerializer):
+    username = serializers.CharField(required=False)
+
     class Meta:
         model = User
         fields = [
@@ -57,15 +62,14 @@ class UserSerializers(serializers.ModelSerializer):
 
 
 class ChangeUserYesPassword(serializers.Serializer):
-    username = serializers.CharField(required=False)
-    first_name = serializers.CharField(required=False)
-    last_name = serializers.CharField(required=False)
-    patronymic = serializers.CharField(required=False)
-    email = serializers.EmailField(required=False)
-    password = serializers.CharField()
-    new_password = serializers.CharField()
-    new_password2 = serializers.CharField()
-    token = serializers.CharField()
+    username = serializers.CharField(required=False, max_length=60)
+    first_name = serializers.CharField(required=False, max_length=60)
+    last_name = serializers.CharField(required=False, max_length=60)
+    patronymic = serializers.CharField(required=False, max_length=60)
+    email = serializers.EmailField(required=False, max_length=255)
+    password = serializers.CharField(required=False)
+    new_password = serializers.CharField(required=False, max_length=50)
+    new_password2 = serializers.CharField(required=False, max_length=50)
 
     def update(self, instance, validated_data):
         if check_password(
@@ -76,8 +80,7 @@ class ChangeUserYesPassword(serializers.Serializer):
                 != self.validated_data["new_password2"]
             ):
                 raise ValidationError(f"Новые пароли не совпадают. Попробуйте ещё раз.")
-            password = self.validated_data["new_password2"]
-            instance.set_password(password)
+            instance.set_password(self.validated_data["new_password2"])
             instance.username = validated_data.get("username", instance.username)
             instance.first_name = validated_data.get("first_name", instance.first_name)
             instance.last_name = validated_data.get("last_name", instance.last_name)

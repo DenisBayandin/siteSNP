@@ -5,8 +5,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db import models
+from drf_yasg.utils import swagger_auto_schema
 
-from ..serializers.comment_serializers import CommentSerializers
+from ..serializers.comment_serializers import (
+    CommentSerializers,
+    AutoSwaggerShcemeCommentSerializers,
+)
 from vote_photo.mymodels.model_comment import Comment
 
 
@@ -31,6 +35,7 @@ class CreateCommentOnePhotoView(APIView):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
+    @swagger_auto_schema(request_body=AutoSwaggerShcemeCommentSerializers)
     def post(self, request, photo_id, format=None, *args, **kwargs):
         serializers = CommentSerializers(
             data=(request.data.dict() | {"photo": photo_id, "user": request.user.id})
@@ -54,6 +59,7 @@ class СhangeOneCommentView(APIView):
     def get_objects(self, comment_id):
         return get_object_or_404(Comment, id=comment_id)
 
+    @swagger_auto_schema(request_body=AutoSwaggerShcemeCommentSerializers)
     def put(self, request, comment_id, format=None):
         comment = self.get_objects(comment_id)
         if self.verification_of_credentials(request, comment):

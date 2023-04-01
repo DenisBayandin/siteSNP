@@ -7,6 +7,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.core.exceptions import ValidationError
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework.parsers import MultiPartParser
+
 
 from ..serializers.user_serializers import (
     UserRegisterSerializers,
@@ -22,6 +25,7 @@ class UsersView(APIView):
         serializers = UserSerializers(users, many=True)
         return Response(serializers.data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(request_body=UserRegisterSerializers)
     def post(self, request, format=None, *args, **kwargs):
         serializers = UserRegisterSerializers(data=request.data)
         if serializers.is_valid():
@@ -37,6 +41,7 @@ class UsersView(APIView):
 class DetailUser(APIView):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
+    parser_classes = (MultiPartParser,)
 
     def get_objects(self, user_id):
         return get_object_or_404(User, id=user_id)
@@ -46,6 +51,7 @@ class DetailUser(APIView):
         serializers = UserSerializers(user)
         return Response(serializers.data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(request_body=ChangeUserYesPassword)
     def put(self, request, user_id, format=None):
         user = self.get_objects(user_id)
         if request.user.id != user_id:
@@ -74,7 +80,6 @@ class DetailUser(APIView):
                 serializers = UserSerializers(user, data=request.data)
             if serializers.is_valid():
                 try:
-                    # breakpoint()
                     serializers.update(user, validated_data=request.data)
                 except ValidationError:
                     return Response(
@@ -86,27 +91,3 @@ class DetailUser(APIView):
                     )
                 return Response(serializers.data, status=status.HTTP_200_OK)
             return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, user_id, format=None):
-        user = self.get_objects(user_id)
-        if request.user.id != user_id:
-            try:
-                raise PermissionError(
-                    f"У {request.user} нет полномочий удалять юзера '{user}'."
-                )
-            except PermissionError:
-                return Response(
-                    {
-                        "error": f"У {request.user} нет полномочий удалять юзера '{user}'.",
-                        "status": status.HTTP_400_BAD_REQUEST,
-                    },
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-        else:
-            token = Token.objects.get(user_id=user_id)
-            token.delete()
-            user.delete()
-            return Response(
-                {"status": status.HTTP_204_NO_CONTENT},
-                status=status.HTTP_204_NO_CONTENT,
-            )

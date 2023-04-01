@@ -1,12 +1,13 @@
 from django.shortcuts import get_object_or_404
 from django.utils.datastructures import MultiValueDictKeyError
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.decorators import api_view
-from rest_framework.generics import ListAPIView
+from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from drf_yasg.utils import swagger_auto_schema
+
 
 from vote_photo.mymodels.model_photo import Photo
 from ..serializers.photo_serializers import (
@@ -20,12 +21,14 @@ from ..serializers.photo_serializers import (
 class AllPhotoView(APIView):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
+    parser_classes = (MultiPartParser,)
 
     def get(self, request):
         photo = Photo.objects.filter(state="Verified")
         serializers = AllPhotoSerializers(photo, many=True)
         return Response(serializers.data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(request_body=LoadPhotoSerializers)
     def post(self, request, format=None, *args, **kwargs):
         serializer = LoadPhotoSerializers(
             data=(request.data.dict() | {"user": request.user.id})
@@ -39,6 +42,7 @@ class AllPhotoView(APIView):
 class СhangeOnePhotoView(APIView):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
+    parser_classes = (MultiPartParser,)
 
     def get_objects(self, id):
         return get_object_or_404(Photo, id=id)
@@ -54,6 +58,7 @@ class СhangeOnePhotoView(APIView):
         serializers = AllPhotoSerializers(photo)
         return Response(serializers.data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(request_body=LoadPhotoSerializers)
     def put(self, request, id, format=None):
         photo = self.get_objects(id)
         if request.user.id == photo.user.id:

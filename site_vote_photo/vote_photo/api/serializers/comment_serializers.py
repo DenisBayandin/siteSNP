@@ -15,3 +15,12 @@ class CommentSerializers(serializers.ModelSerializer):
             "photo",
             "user",
         ]
+
+
+class AutoSwaggerShcemeCommentSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = [
+            "content",
+            "parent",
+        ]

@@ -19,9 +19,11 @@ class AllPhotoSerializers(serializers.ModelSerializer):
 
 
 class LoadPhotoSerializers(serializers.ModelSerializer):
+    name = serializers.CharField(required=False)
+
     class Meta:
         model = Photo
-        fields = ["id", "name", "content", "old_photo", "user"]
+        fields = ["id", "name", "content", "old_photo"]
 
 
 class UpdatePhotoYesPhotoSerializers(serializers.ModelSerializer):

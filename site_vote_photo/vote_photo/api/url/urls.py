@@ -20,7 +20,8 @@ from ..view.comment_view import (
 from ..view.like_view import AllLikesOnePhotoView, CreateLikeView, ChangeLikeView
 from ..view.user_view import UsersView, DetailUser
 from ..view.refresh_token_view import RefreshTokenView
-from ..view.admin_view import AdminChangingStatePhotoView
+from ..view.admin_view import AdminChangingStatePhotoView, AdminUpdatePhotoView
+from ..view.custom_auth_token_view import CustomGetAuthTokenView
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -35,12 +36,12 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("photos/", AllPhotoView.as_view()),
-    path("photos/one_photo/<int:photo_id>/", GetOnePhotoView.as_view()),
+    path("photos/one_photo/get/<int:photo_id>/", GetOnePhotoView.as_view()),
     path("photos/one_photo/change/<int:id>/", СhangeOnePhotoView.as_view()),
     path("users/", UsersView.as_view()),
     path("users/one_user/<int:user_id>/", DetailUser.as_view()),
-    path("login/", obtain_auth_token),
-    path("login/refresh/", RefreshTokenView.as_view()),
+    path("login/", CustomGetAuthTokenView.as_view()),
+    path("login/refresh_token/", RefreshTokenView.as_view()),
     path("user/photos/<str:filter>/", PhotosUserFilter.as_view()),
     path("comments/create/photos/<int:photo_id>/", CreateCommentOnePhotoView.as_view()),
     path(
@@ -55,6 +56,7 @@ urlpatterns = [
         "admin/changing_state/<str:state>/<int:photo_id>/",
         AdminChangingStatePhotoView.as_view(),
     ),
+    path("admin/update_photo/<int:photo_id>/", AdminUpdatePhotoView.as_view()),
     path(
         "swagger/",
         schema_view.with_ui("swagger", cache_timeout=0),
