@@ -18,5 +18,11 @@ from .myviews.one_photo_view import (
 )
 from .myviews.photo_one_user import SortedAllPhotoOneUser, view_all_photo
 from .myviews.photo_view import MainView, MainSortedView, MainSearchView
-from .myviews.reg_aut_login_view import RegisterUser, LoginUser, profile, logout_view
+from .myviews.reg_aut_login_view import (
+    RegisterUser,
+    LoginUser,
+    profile,
+    logout_view,
+    update_password,
+)
 from .myviews.rename_view import rename_token, rename_profile

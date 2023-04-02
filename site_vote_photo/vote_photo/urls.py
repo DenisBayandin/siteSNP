@@ -28,6 +28,7 @@ from .views import (
     update_photo,
     update_state_verified,
     update_state_not_verified,
+    update_password,
 )
 
 
@@ -87,4 +88,5 @@ urlpatterns = [
     path("token/", obtain_auth_token),
     path("rename_token/", rename_token, name="rename_token"),
     path("rename_profile/", rename_profile, name="rename_profile"),
+    path("update_password/", update_password, name="update_password"),
 ]

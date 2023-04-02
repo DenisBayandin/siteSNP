@@ -84,7 +84,14 @@
                 </div>
             </div>
 
-            <h5>Добавьте фотографию.</h5>
+            <h5>Обновить пароль: </h5>
+            <form action="{% url 'update_password' %}" method="post">
+                {% csrf_token %}
+                {{ form_update_password.as_p}}
+                <p><button type="submit" class="btn btn-dark"> Сохранить </button></p>
+            </form>
+
+            <h5>Добавить фотографию:</h5>
 
             <form action="{% url 'profile' %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}

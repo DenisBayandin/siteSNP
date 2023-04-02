@@ -133,3 +133,15 @@ class AddNewPhotoForm(forms.ModelForm):
             self.fields["name"].required = False
             self.fields["content"].required = False
             self.fields["new_photo"].required = False
+
+
+class UpdatePasswordForm(forms.Form):
+    password = forms.CharField(
+        label="Ваш пароль", widget=forms.TextInput(attrs={"class": "form-input"})
+    )
+    new_password = forms.CharField(
+        label="Новый пароль", widget=forms.TextInput(attrs={"class": "form-input"})
+    )
+    new_password2 = forms.CharField(
+        label="Повторите пароль", widget=forms.TextInput(attrs={"class": "form-input"})
+    )
