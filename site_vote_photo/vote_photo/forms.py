@@ -123,7 +123,7 @@ class AddNewPhotoForm(forms.ModelForm):
                 return file
             else:
                 raise ValidationError(
-                    "Вы сохранили файл не с jpg расширением," " нам нужно '.jpg'"
+                    "Вы сохранили файл не с jpg расширением, нам нужно '.jpg'"
                 )
 
     def __init__(self, *args, **kwargs):

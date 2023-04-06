@@ -1,10 +1,8 @@
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
 from django.http import Http404
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import render, redirect
 from django.views.generic import ListView
 
-from ..models import Photo, User, Notification
+from ..services.service_admin_view import *
 
 channel_layer = get_channel_layer()
 
@@ -93,23 +91,14 @@ def show_photo_admin(request, photoID):
     и отображаем фотографию
     """
     if request.user.is_staff and request.user.is_superuser:
-        photo = get_object_or_404(Photo, id=photoID)
-        if photo.state == "On check":
-            photo.go_state_not_verified()
-            photo.go_state_on_check()
-            return render(
-                request,
-                "vote_photo/showPhotoAdmin.html",
-                {"title": "Проверка фотографии", "photo": photo},
-            )
-        else:
-            photo.go_state_on_check()
-            photo.save()
-            return render(
-                request,
-                "vote_photo/showPhotoAdmin.html",
-                {"title": "Проверка фотографии", "photo": photo},
-            )
+        photo = ShowPhotoAdminService.execute(
+            {"photo": get_object_or_404(Photo, id=photoID)}
+        )
+        return render(
+            request,
+            "vote_photo/showPhotoAdmin.html",
+            {"title": "Проверка фотографии", "photo": photo},
+        )
     else:
         return Http404(
             f"{request.user.username} не является админом!"
@@ -146,17 +135,9 @@ def update_state_verified(request, photoID):
     Создаём и отправляем увдомление создателю фотографии,
      что его фотография прошла проверку.
     """
-    photo = get_object_or_404(Photo, id=photoID)
     if request.method == "POST":
-        photo.go_state_verified()
-        photo.save()
-        get_user = User.objects.get(id=photo.user_id)
-        notification = Notification.objects.create(
-            message=f"Вашу фотографию '{photo.name}' одобрили."
-        )
-        async_to_sync(channel_layer.group_send)(
-            get_user.group_name,
-            {"type": "send_new_data", "message": notification.message},
+        UpdateStateOnVerifiedService.execute(
+            {"photo": get_object_or_404(Photo, id=photoID)}
         )
         return redirect("photoNotVerified")
 
@@ -169,17 +150,9 @@ def update_state_not_verified(request, photoID):
     Создаём и отправляем увдомление создателю фотографии,
      что его фотография не прошла проверку.
     """
-    photo = get_object_or_404(Photo, id=photoID)
     if request.method == "POST":
-        photo.go_state_not_verified()
-        photo.save()
-        get_user = User.objects.get(id=photo.user_id)
-        notification = Notification.objects.create(
-            message=f"Вашу фотографию '{photo.name}' отклонили."
-        )
-        async_to_sync(channel_layer.group_send)(
-            get_user.group_name,
-            {"type": "send_new_data", "message": notification.message},
+        UpdateStateOnNotVerifiedService.execute(
+            {"photo": get_object_or_404(Photo, id=photoID)}
         )
         return redirect("photoNotVerified")
 
@@ -194,9 +167,7 @@ def update_photo(request, photoID):
      новую фотографию удаляем.
     Меняем state с Update на Verified.
     """
-    up_photo = get_object_or_404(Photo, id=photoID)
-    up_photo.old_photo = up_photo.new_photo
-    up_photo.new_photo = None
-    up_photo.go_state_verified()
-    up_photo.save()
+    UpdateOldPhotoOnNewPhotoService.execute(
+        {"photo": get_object_or_404(Photo, id=photoID)}
+    )
     return redirect("photoUpdate")

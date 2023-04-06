@@ -3,7 +3,7 @@ import json
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 
-from ..models import Like, Photo
+from ..services.service_like_view import *
 
 
 def add_like(request):
@@ -22,17 +22,14 @@ def add_like(request):
         data = json.load(request)
         if is_ajax:
             if request.method == "POST":
-                if Like.objects.filter(
-                    photo=data.get("photoID"), user=request.user
-                ).exists():
-                    one_like_user = Like.objects.get(
-                        photo=data.get("photoID"), user=request.user
-                    )
-                    one_like_user.delete()
+                if AddLikeService.execute(
+                    {
+                        "user": request.user,
+                        "photo": get_object_or_404(Photo, id=data.get("photoID")),
+                    }
+                ):
                     return HttpResponse(status=200)
                 else:
-                    photo = get_object_or_404(Photo, id=data.get("photoID"))
-                    Like.objects.create(user=request.user, photo=photo)
                     return HttpResponse(status=201)
         else:
             return HttpResponse("Ошибка.", status=400, reason="Invalid request")

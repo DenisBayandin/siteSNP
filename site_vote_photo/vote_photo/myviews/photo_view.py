@@ -69,6 +69,4 @@ class MainSearchView(ListView):
             set_gueryset = set(self.queryset)
             set_photo_search_to_user = set(photo_search_to_user)
             self.queryset = list(set_gueryset.union(set_photo_search_to_user))
-        else:
-            self.queryset = None
         return super().get_queryset()

@@ -1,4 +1,3 @@
-import vk
 from django.contrib.auth import login
 from django.contrib.auth import logout
 from django.contrib.auth.hashers import check_password
@@ -7,13 +6,11 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.views.generic import CreateView
 from rest_framework.authtoken.models import Token
-from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status
 
 from ..forms import RegisterUsersForm, LoginUsersForm, AddPhotoForm, UpdatePasswordForm
 from .rename_lifetime_token import rename_lifetime_token_vk
-
-version_vk_api = "5.131"
+from ..services.service_reg_aut_login_view import ProfileGetPhotoFromVkService
 
 
 class RegisterUser(CreateView):
@@ -67,17 +64,10 @@ def profile(request):
     """
     if rename_lifetime_token_vk(request, request.user):
         return redirect("login")
-    try:
-        token = Token.objects.get(user=request.user.id)
-    except ObjectDoesNotExist:
-        token = Token.objects.create(user=request.user)
+    token = Token.objects.get_or_create(user=request.user.id)
     user = request.user
     if user.photo_by_user.name == "":
-        social = user.social_auth.get(provider="vk-oauth2")
-        api = vk.API(access_token=social.extra_data["access_token"], v=version_vk_api)
-        json_vk = api.users.get(fields="photo_200")
-        user.url_photo_by_user_from_VK = json_vk[0]["photo_200"]
-        user.save()
+        ProfileGetPhotoFromVkService.execute({"user": request.user})
     if request.method == "POST":
         form = AddPhotoForm(request.POST, request.FILES)
         if form.is_valid():

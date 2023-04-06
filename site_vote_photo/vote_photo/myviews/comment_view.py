@@ -1,7 +1,8 @@
-from django.core.exceptions import ValidationError
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 
-from ..models import Comment
+
+from ..services.service_comment_view import *
 
 
 def delete_comment(request, commentID, photoID):
@@ -14,12 +15,14 @@ def delete_comment(request, commentID, photoID):
      на фотографии.
     """
     comment = get_object_or_404(Comment, id=commentID)
-    for comment_children in Comment.objects.filter(parent=commentID):
-        if comment_children.parent.id == comment.id:
-            raise ValidationError("Невозможно удалить данный комментарий.")
-    if request.user == comment.user:
-        comment.delete()
-        return redirect("show_photo", photoID)
+    try:
+        DeleteCommentService.execute({"comment": comment, "user": request.user})
+    except ValidationError:
+        return HttpResponse(
+            "Не возможно удалить данные комментарий, так как имеются ответы.",
+            status=400,
+        )
+    return redirect("show_photo", photoID)
 
 
 def update_comment(request, commentID, photoID):

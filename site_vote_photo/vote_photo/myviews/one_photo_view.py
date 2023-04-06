@@ -1,13 +1,12 @@
-from asgiref.sync import async_to_sync
 from django.contrib.auth.models import AnonymousUser
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from channels.layers import get_channel_layer
 
 from ..forms import AddComment, AddNewPhotoForm
-from ..models import Comment, Photo, User, Notification
+from ..models import Comment, Photo
 from .rename_lifetime_token import rename_lifetime_token_vk
+from ..services.service_comment_view import SendNotificationComment
+from ..services.service_photo_view import CancelDeletePhotoService
 
 channel_layer = get_channel_layer()
 
@@ -29,10 +28,7 @@ def show_one_photo(request, photoID):
             return redirect("login")
     comment_show = Comment.objects.filter(photo=photoID, parent=None)
     comment_children_show = Comment.objects.exclude(parent=None).filter(photo=photoID)
-    try:
-        photo = Photo.objects.get(id=photoID)
-    except ObjectDoesNotExist:
-        raise Http404(f"Фотографии {photoID} не существует.")
+    photo = get_object_or_404(Photo, id=photoID)
     if request.method == "POST":
         form = AddComment(request.POST)
         if form.is_valid():
@@ -44,23 +40,7 @@ def show_one_photo(request, photoID):
             obj.save()
             # TODO Нотификация о том,
             #  что некоторый пользователь оставил комментарий.
-            notification_photo = Photo.objects.get(id=photoID)
-            get_user_create_photo = User.objects.get(id=notification_photo.user_id)
-            notification = Notification.objects.create(
-                sender=request.user,
-                message=(
-                    f"Пользователь {request.user.username} оставил "
-                    f"комментарий под фотографией: {notification_photo.name}"
-                    f"\nОбщее кол-во комментариев на фотографии: {notification_photo.count_comment}"
-                ),
-            )
-            try:
-                async_to_sync(channel_layer.group_send)(
-                    get_user_create_photo.group_name,
-                    {"type": "send_new_data", "message": notification.message},
-                )
-            except:
-                return redirect(photo.get_absolute_url())
+            SendNotificationComment.execute({"user": request.user, "photo": photo})
             return redirect(photo.get_absolute_url())
     else:
         form = AddComment
@@ -122,9 +102,5 @@ def cancel_delete_photo(request, photoID):
     Получаем фотографию, затем меняем state на Not verified
     Ставим поля date_now, date_delete на None
     """
-    photo = get_object_or_404(Photo, id=photoID)
-    photo.go_state_not_verified()
-    photo.date_now = None
-    photo.date_delete = None
-    photo.save()
+    CancelDeletePhotoService.execute({"photo": get_object_or_404(Photo, id=photoID)})
     return redirect("all_photo")
