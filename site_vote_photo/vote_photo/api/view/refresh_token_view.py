@@ -18,7 +18,11 @@ class RefreshTokenView(APIView):
     authentication_classes = (TokenAuthentication,)
     parser_classes = (MultiPartParser,)
 
-    @swagger_auto_schema(request_body=RefreshTokenSerializers)
+    @swagger_auto_schema(
+        request_body=RefreshTokenSerializers,
+        tags=["token"],
+        operation_description="Refresh TOKEN.",
+    )
     def put(self, request, format=None):
         try:
             user_get_request = User.objects.get(username=request.data["username"])

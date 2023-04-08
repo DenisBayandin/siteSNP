@@ -20,12 +20,19 @@ from vote_photo.mymodels.model_user import User
 
 
 class UsersView(APIView):
+    parser_classes = (MultiPartParser,)
+
+    @swagger_auto_schema(tags=["User"], operation_description="View all users.")
     def get(self, request, format=None):
         users = User.objects.all()
         serializers = UserSerializers(users, many=True)
         return Response(serializers.data, status=status.HTTP_200_OK)
 
-    @swagger_auto_schema(request_body=UserRegisterSerializers)
+    @swagger_auto_schema(
+        request_body=UserRegisterSerializers,
+        tags=["User"],
+        operation_description="Creating a new user.",
+    )
     def post(self, request, format=None, *args, **kwargs):
         serializers = UserRegisterSerializers(data=request.data)
         if serializers.is_valid():
@@ -46,12 +53,17 @@ class DetailUser(APIView):
     def get_objects(self, user_id):
         return get_object_or_404(User, id=user_id)
 
+    @swagger_auto_schema(tags=["User"], operation_description="View one user.")
     def get(self, request, user_id, format=None):
         user = self.get_objects(user_id)
         serializers = UserSerializers(user)
         return Response(serializers.data, status=status.HTTP_200_OK)
 
-    @swagger_auto_schema(request_body=ChangeUserYesPassword)
+    @swagger_auto_schema(
+        request_body=ChangeUserYesPassword,
+        tags=["User"],
+        operation_description="Changing user data.",
+    )
     def put(self, request, user_id, format=None):
         user = self.get_objects(user_id)
         if request.user.id != user_id:

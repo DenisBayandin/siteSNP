@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django_fsm import TransitionNotAllowed
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.views import APIView
@@ -18,11 +19,17 @@ class AdminChangingStatePhotoView(APIView):
     def get_objects(self, id):
         return get_object_or_404(Photo, id=id)
 
+    @swagger_auto_schema(
+        tags=["Admin"], operation_description="View one photo in admin-panel."
+    )
     def get(self, request, photo_id, state, format=None):
         photo = self.get_objects(photo_id)
         serializers = AllPhotoSerializers(photo)
         return Response(serializers.data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        tags=["Admin"], operation_description="Changing the status of the photo."
+    )
     def put(self, request, photo_id, state, format=None, *args, **kwargs):
         photo = self.get_objects(photo_id)
         try:
@@ -67,6 +74,12 @@ class AdminUpdatePhotoView(APIView):
     permission_classes = (IsAuthenticated, IsAdminUser)
     authentication_classes = (TokenAuthentication,)
 
+    @swagger_auto_schema(
+        tags=["Admin"],
+        operation_description="Approval of the photo modification."
+        " We change the old photo to a new one and delete the photos,"
+        " or change the photo data.",
+    )
     def put(self, request, photo_id, format=None):
         photo = get_object_or_404(Photo, id=photo_id)
         if photo.state == "Update":

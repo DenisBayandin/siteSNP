@@ -23,12 +23,20 @@ class AllPhotoView(APIView):
     authentication_classes = (TokenAuthentication,)
     parser_classes = (MultiPartParser,)
 
+    @swagger_auto_schema(
+        tags=["Photo"],
+        operation_description="View all photos with the status=Verified.",
+    )
     def get(self, request):
         photo = Photo.objects.filter(state="Verified")
         serializers = AllPhotoSerializers(photo, many=True)
         return Response(serializers.data, status=status.HTTP_200_OK)
 
-    @swagger_auto_schema(request_body=LoadPhotoSerializers)
+    @swagger_auto_schema(
+        request_body=LoadPhotoSerializers,
+        tags=["Photo"],
+        operation_description="Creating a photo.",
+    )
     def post(self, request, format=None, *args, **kwargs):
         serializer = LoadPhotoSerializers(
             data=(request.data.dict() | {"user": request.user.id})
@@ -53,12 +61,17 @@ class СhangeOnePhotoView(APIView):
         photo.save()
         return 0
 
+    @swagger_auto_schema(tags=["Photo"], operation_description="View one photo.")
     def get(self, request, id, format=None):
         photo = self.get_objects(id)
         serializers = AllPhotoSerializers(photo)
         return Response(serializers.data, status=status.HTTP_200_OK)
 
-    @swagger_auto_schema(request_body=LoadPhotoSerializers)
+    @swagger_auto_schema(
+        request_body=LoadPhotoSerializers,
+        tags=["Photo"],
+        operation_description="Changing the data of the photo or the photo itself.",
+    )
     def put(self, request, id, format=None):
         photo = self.get_objects(id)
         if request.user.id == photo.user.id:
@@ -77,6 +90,7 @@ class СhangeOnePhotoView(APIView):
                 f"У {request.user} нет полномочий изменять данную фотографию."
             )
 
+    @swagger_auto_schema(tags=["Photo"], operation_description="Delete photo.")
     def delete(self, request, id, format=None):
         photo = self.get_objects(id)
         if request.user.id == photo.user.id:
@@ -98,6 +112,9 @@ class PhotosUserFilter(APIView):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
+    @swagger_auto_schema(
+        tags=["Photo"], operation_description="Filtering photos by status."
+    )
     def get(self, request, filter, format=None):
         filters = {
             "verified": "Verified",
@@ -126,6 +143,9 @@ class GetOnePhotoView(APIView):
     def get_objects(self, id):
         return get_object_or_404(Photo, id=id)
 
+    @swagger_auto_schema(
+        tags=["Photo"], operation_description="View one photo, for all users"
+    )
     def get(self, request, photo_id, format=None):
         photo = self.get_objects(photo_id)
         serializers = AllPhotoSerializers(photo)

@@ -1,5 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -12,6 +13,7 @@ from vote_photo.mymodels.model_photo import Photo
 
 
 class AllLikesOnePhotoView(APIView):
+    @swagger_auto_schema(tags=["Like"], operation_description="View all like one photo")
     def get(self, request, photo_id, format=None):
         likes = Like.objects.filter(photo=photo_id)
         serializers = LikeSerializers(likes, many=True)
@@ -22,6 +24,11 @@ class CreateLikeView(APIView):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
+    @swagger_auto_schema(
+        tags=["Like"],
+        operation_description="Creating a like, if there is already a"
+        " like on the photo, then delete the like.",
+    )
     def post(self, request, photo_id, format=None, *args, **kwargs):
         try:
             like = Like.objects.get(photo=photo_id, user=request.user)
@@ -49,11 +56,13 @@ class ChangeLikeView(APIView):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
 
+    @swagger_auto_schema(tags=["Like"], operation_description="Get one like.")
     def get(self, request, photo_id, format=None):
         like = Like.objects.get(photo=photo_id, user=request.user.id)
         serializers = LikeSerializers(like)
         return Response(serializers.data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(tags=["Like"], operation_description="Delete ")
     def delete(self, request, photo_id, format=None):
         try:
             like = Like.objects.get(photo=photo_id, user=request.user)

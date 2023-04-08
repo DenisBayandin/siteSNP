@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -15,6 +16,9 @@ from vote_photo.mymodels.model_comment import Comment
 
 
 class AllCommentOnePhotoView(APIView):
+    @swagger_auto_schema(
+        tags=["Comment"], operation_description="View all comments to one photo."
+    )
     def get(self, request, photo_id, format=None):
         comment = Comment.objects.filter(photo_id=photo_id)
         serializers = CommentSerializers(comment, many=True)
@@ -25,6 +29,7 @@ class OneCommentView(APIView):
     def get_objects(self, comment_id):
         return get_object_or_404(Comment, id=comment_id)
 
+    @swagger_auto_schema(tags=["Comment"], operation_description="View one comment.")
     def get(self, request, comment_id, format=None):
         comment = self.get_objects(comment_id)
         serializers = CommentSerializers(comment)
@@ -34,8 +39,13 @@ class OneCommentView(APIView):
 class CreateCommentOnePhotoView(APIView):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
+    parser_classes = (MultiPartParser,)
 
-    @swagger_auto_schema(request_body=AutoSwaggerShcemeCommentSerializers)
+    @swagger_auto_schema(
+        request_body=AutoSwaggerShcemeCommentSerializers,
+        tags=["Comment"],
+        operation_description="Creating a comment.",
+    )
     def post(self, request, photo_id, format=None, *args, **kwargs):
         serializers = CommentSerializers(
             data=(request.data.dict() | {"photo": photo_id, "user": request.user.id})
@@ -49,6 +59,7 @@ class CreateCommentOnePhotoView(APIView):
 class СhangeOneCommentView(APIView):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
+    parser_classes = (MultiPartParser,)
 
     def verification_of_credentials(self, request, comment):
         if request.user.id == comment.user.id:
@@ -59,7 +70,11 @@ class СhangeOneCommentView(APIView):
     def get_objects(self, comment_id):
         return get_object_or_404(Comment, id=comment_id)
 
-    @swagger_auto_schema(request_body=AutoSwaggerShcemeCommentSerializers)
+    @swagger_auto_schema(
+        request_body=AutoSwaggerShcemeCommentSerializers,
+        tags=["Comment"],
+        operation_description="Changing the comment data.",
+    )
     def put(self, request, comment_id, format=None):
         comment = self.get_objects(comment_id)
         if self.verification_of_credentials(request, comment):
@@ -78,6 +93,7 @@ class СhangeOneCommentView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+    @swagger_auto_schema(tags=["Comment"], operation_description="")
     def delete(self, request, comment_id, format=None):
         try:
             comment = self.get_objects(comment_id)
