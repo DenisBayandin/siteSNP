@@ -29,16 +29,11 @@ class ViewPhotoNotVerified(ListView):
         return context
 
     def get_queryset(self):
-        if self.request.user.is_staff and self.request.user.is_superuser:
-            set_gueryset = set(Photo.objects.filter(state="Not verified"))
-            set_photo_search_to_user = set(Photo.objects.filter(state="On check"))
-            self.queryset = list(set_gueryset.union(set_photo_search_to_user))
-            return super().get_queryset()
-        else:
-            raise Http404(
-                f"{self.request.user.username} не является админом!"
-                f" Зайдите на другой аккаунт!"
-            )
+        checking_the_role_user(self.request.user)
+        set_gueryset = set(Photo.objects.filter(state="Not verified"))
+        set_photo_search_to_user = set(Photo.objects.filter(state="On check"))
+        self.queryset = list(set_gueryset.union(set_photo_search_to_user))
+        return super().get_queryset()
 
 
 class ViewPhotoUpdate(ListView):
@@ -52,14 +47,9 @@ class ViewPhotoUpdate(ListView):
         return context
 
     def get_queryset(self):
-        if self.request.user.is_staff and self.request.user.is_superuser:
-            self.queryset = Photo.objects.filter(state="Update")
-            return super().get_queryset()
-        else:
-            raise Http404(
-                f"{self.request.user.username} не является админом!"
-                f" Зайдите на другой аккаунт!"
-            )
+        checking_the_role_user(self.request.user)
+        self.queryset = Photo.objects.filter(state="Update")
+        return super().get_queryset()
 
 
 class ViewPhotoDelete(ListView):
@@ -73,14 +63,9 @@ class ViewPhotoDelete(ListView):
         return context
 
     def get_queryset(self):
-        if self.request.user.is_staff and self.request.user.is_superuser:
-            self.queryset = Photo.objects.filter(state="Delete")
-            return super().get_queryset()
-        else:
-            raise Http404(
-                f"{self.request.user.username} не является админом!"
-                f" Зайдите на другой аккаунт!"
-            )
+        checking_the_role_user(self.request.user)
+        self.queryset = Photo.objects.filter(state="Delete")
+        return super().get_queryset()
 
 
 def show_photo_admin(request, photoID):
@@ -90,20 +75,15 @@ def show_photo_admin(request, photoID):
      то провряем на наличие у фотографии state='On check'
     и отображаем фотографию
     """
-    if request.user.is_staff and request.user.is_superuser:
-        photo = ShowPhotoAdminService.execute(
-            {"photo": get_object_or_404(Photo, id=photoID)}
-        )
-        return render(
-            request,
-            "vote_photo/showPhotoAdmin.html",
-            {"title": "Проверка фотографии", "photo": photo},
-        )
-    else:
-        return Http404(
-            f"{request.user.username} не является админом!"
-            f" Зайдите на другой аккаунт!"
-        )
+    checking_the_role_user(request.user)
+    photo = ShowPhotoAdminService.execute(
+        {"photo": get_object_or_404(Photo, id=photoID)}
+    )
+    return render(
+        request,
+        "vote_photo/showPhotoAdmin.html",
+        {"title": "Проверка фотографии", "photo": photo},
+    )
 
 
 def show_photo_admin_update(request, photoID):
@@ -113,18 +93,13 @@ def show_photo_admin_update(request, photoID):
      то показыаем ему фотографию.
     Иначе ошибка (Http404).
     """
-    if request.user.is_staff and request.user.is_superuser:
-        photo = get_object_or_404(Photo, id=photoID)
-        return render(
-            request,
-            "vote_photo/showPhotoAdminUpdate.html",
-            {"title": "Проверка фотографии", "photo": photo},
-        )
-    else:
-        return Http404(
-            f"{request.user.username} не является админом!"
-            f" Зайдите на другой аккаунт!"
-        )
+    checking_the_role_user(request.user)
+    photo = get_object_or_404(Photo, id=photoID)
+    return render(
+        request,
+        "vote_photo/showPhotoAdminUpdate.html",
+        {"title": "Проверка фотографии", "photo": photo},
+    )
 
 
 def update_state_verified(request, photoID):

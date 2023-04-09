@@ -4,6 +4,8 @@ from ..models import Photo
 from .rename_lifetime_token import rename_lifetime_token_vk
 from django.shortcuts import render, redirect
 
+from ..services.service_photo_view import ServiceSortedPhotoOneUser
+
 
 class SortedAllPhotoOneUser(ListView):
     # TODO Сортировка всех фотографий одного пользователя.
@@ -14,16 +16,9 @@ class SortedAllPhotoOneUser(ListView):
     def get_queryset(self):
         if rename_lifetime_token_vk(self.request, self.request.user):
             return redirect("login")
-        photo_all = []
-        get_sorted_name = self.kwargs.get("sorting")
-        if get_sorted_name == "All photo":
-            self.queryset = Photo.objects.filter(user=self.request.user.id)
-            return super().get_queryset()
-        photo_one_user = Photo.objects.filter(user=self.request.user.id)
-        for photo_one in photo_one_user:
-            if photo_one.state == get_sorted_name:
-                photo_all.append(photo_one)
-        self.queryset = list(set(photo_all))
+        self.queryset = ServiceSortedPhotoOneUser.execute(
+            {"sorted": self.kwargs.get("sorting"), "user": self.request.user}
+        )
         return super().get_queryset()
 
 

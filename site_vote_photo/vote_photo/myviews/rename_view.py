@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.authtoken.models import Token
 
 from ..models import User
+from ..services.service_rename_view import ServiceRenameToken, ServiceRenameProfile
 
 
 def rename_token(request):
@@ -14,9 +15,9 @@ def rename_token(request):
     После чего удаляем его и создаём новый, передавая текущего юзера
     И отправляем статус, токен в асинхронный запрос.
     """
-    token = get_object_or_404(Token, user=request.user.id)
-    token.delete()
-    token = Token.objects.create(user=request.user)
+    token = ServiceRenameToken.execute(
+        {"token": get_object_or_404(Token, user=request.user.id), "user": request.user}
+    )
     data = {"status": 200, "token": str(token)}
     return JsonResponse(data)
 
@@ -39,13 +40,16 @@ def rename_profile(request):
     data = json.load(request)
     if is_ajax:
         if request.method == "POST":
-            user = User.objects.get(id=request.user.id)
-            user.username = data.get("new_username")
-            user.first_name = data.get("new_name")
-            user.last_name = data.get("new_family")
-            user.patronymic = data.get("new_patronymic")
-            user.email = data.get("new_email")
-            user.save()
+            ServiceRenameProfile.execute(
+                {
+                    "username": data.get("new_username"),
+                    "first_name": data.get("new_name"),
+                    "last_name": data.get("new_family"),
+                    "patronymic": data.get("new_patronymic"),
+                    "email": data.get("new_email"),
+                    "user": User.objects.get(id=request.user.id),
+                }
+            )
             return HttpResponse(status=200)
     else:
         return HttpResponse("Ошибка.", status=400, reason="Invalid request")

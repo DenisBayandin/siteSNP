@@ -5,7 +5,7 @@ from channels.layers import get_channel_layer
 from ..forms import AddComment, AddNewPhotoForm
 from ..models import Comment, Photo
 from .rename_lifetime_token import rename_lifetime_token_vk
-from ..services.service_comment_view import SendNotificationComment
+from ..services.service_comment_view import SendNotificationCommentService
 from ..services.service_photo_view import CancelDeletePhotoService
 
 channel_layer = get_channel_layer()
@@ -40,7 +40,9 @@ def show_one_photo(request, photoID):
             obj.save()
             # TODO Нотификация о том,
             #  что некоторый пользователь оставил комментарий.
-            SendNotificationComment.execute({"user": request.user, "photo": photo})
+            SendNotificationCommentService.execute(
+                {"user": request.user, "photo": photo}
+            )
             return redirect(photo.get_absolute_url())
     else:
         form = AddComment

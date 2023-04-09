@@ -2,6 +2,7 @@ from django.contrib.auth import login
 from django.contrib.auth import logout
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.views import LoginView
+from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.views.generic import CreateView
@@ -10,7 +11,10 @@ from rest_framework import status
 
 from ..forms import RegisterUsersForm, LoginUsersForm, AddPhotoForm, UpdatePasswordForm
 from .rename_lifetime_token import rename_lifetime_token_vk
-from ..services.service_reg_aut_login_view import ProfileGetPhotoFromVkService
+from ..services.service_reg_aut_login_view import (
+    ProfileGetPhotoFromVkService,
+    ServiceUpdatePassword,
+)
 
 
 class RegisterUser(CreateView):
@@ -85,7 +89,7 @@ def profile(request):
             "form": form,
             "form_update_password": form_update_password,
             "title": "Личный кабинет",
-            "token": token,
+            "token": token[0].key,
         },
     )
 
@@ -94,30 +98,26 @@ def update_password(request):
     if request.method == "POST":
         form = UpdatePasswordForm(request.POST)
         if form.is_valid():
-            if check_password(form.cleaned_data["password"], request.user.password):
-                if (
-                    form.cleaned_data["new_password"]
-                    != form.cleaned_data["new_password2"]
-                ):
-                    try:
-                        raise ValueError("Новые пароли не сходятся.")
-                    except ValueError:
-                        return HttpResponse(
-                            "Новые пароли не сходятся.",
-                            status=status.HTTP_400_BAD_REQUEST,
-                        )
-                else:
-                    request.user.set_password(form.cleaned_data["new_password"])
-                    request.user.save()
-                    return redirect("login")
-            else:
-                try:
-                    raise ValueError("Ввели не верный основной пароль.")
-                except ValueError:
-                    return HttpResponse(
-                        "Ввели не верный основной пароль.",
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
+            try:
+                ServiceUpdatePassword.execute(
+                    {
+                        "password": request.POST["password"],
+                        "new_password": request.POST["new_password"],
+                        "new_password2": request.POST["new_password2"],
+                        "user": request.user,
+                    }
+                )
+            except ValueError:
+                return HttpResponse(
+                    "Новые пароли не сходятся.",
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            except ValidationError:
+                return HttpResponse(
+                    "Ввели не верный основной пароль.",
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            return redirect("login")
         else:
             return HttpResponse(
                 "form.is_valid() == False", status=status.HTTP_400_BAD_REQUEST

@@ -34,7 +34,7 @@ class DeleteCommentService(Service):
             comment.delete()
 
 
-class SendNotificationComment(Service):
+class SendNotificationCommentService(Service):
     photo = ModelChoiceField(queryset=Photo.objects.all())
     user = ModelChoiceField(queryset=User.objects.all())
 

@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
-
+from django.core.exceptions import ValidationError
 
 from ..services.service_comment_view import *
 
@@ -14,9 +14,10 @@ def delete_comment(request, commentID, photoID):
     Иначе удаляем комментарий и уменьшаем на 1 общее кол-во комментариев
      на фотографии.
     """
-    comment = get_object_or_404(Comment, id=commentID)
     try:
-        DeleteCommentService.execute({"comment": comment, "user": request.user})
+        DeleteCommentService.execute(
+            {"comment": get_object_or_404(Comment, id=commentID), "user": request.user}
+        )
     except ValidationError:
         return HttpResponse(
             "Не возможно удалить данные комментарий, так как имеются ответы.",

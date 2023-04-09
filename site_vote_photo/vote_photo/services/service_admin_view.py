@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from service_objects.services import Service
 from django.forms import ModelChoiceField
@@ -11,6 +12,13 @@ from ..mymodels.model_user import User
 
 
 channel_layer = get_channel_layer()
+
+
+def checking_the_role_user(user):
+    if not (user.is_staff and user.is_superuser):
+        raise Http404(
+            f"{user.username} не является админом!" f" Зайдите на другой аккаунт."
+        )
 
 
 class ShowPhotoAdminService(Service):
