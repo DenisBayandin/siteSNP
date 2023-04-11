@@ -112,7 +112,7 @@ def update_state_verified(request, photoID):
     """
     if request.method == "POST":
         UpdateStateOnVerifiedService.execute(
-            {"photo": get_object_or_404(Photo, id=photoID)}
+            {"photo": get_object_or_404(Photo, id=photoID), "user": request.user}
         )
         return redirect("photoNotVerified")
 
@@ -127,7 +127,7 @@ def update_state_not_verified(request, photoID):
     """
     if request.method == "POST":
         UpdateStateOnNotVerifiedService.execute(
-            {"photo": get_object_or_404(Photo, id=photoID)}
+            {"photo": get_object_or_404(Photo, id=photoID), "user": request.user}
         )
         return redirect("photoNotVerified")
 
@@ -143,6 +143,6 @@ def update_photo(request, photoID):
     Меняем state с Update на Verified.
     """
     UpdateOldPhotoOnNewPhotoService.execute(
-        {"photo": get_object_or_404(Photo, id=photoID)}
+        {"photo": get_object_or_404(Photo, id=photoID), "user": request.user}
     )
     return redirect("photoUpdate")

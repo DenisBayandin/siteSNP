@@ -26,3 +26,4 @@ from .myviews.reg_aut_login_view import (
     update_password,
 )
 from .myviews.rename_view import rename_token, rename_profile
+from .myviews.notification_view import notification_view

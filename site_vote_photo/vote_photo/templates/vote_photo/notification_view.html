@@ -1,0 +1,11 @@
+{% extends 'vote_photo/base.html' %}
+
+{% block content %}
+    {% for notification_one in notification %}
+        <div class="alert alert-dark" role="alert">
+            {{ notification_one.message }}
+            <div>Уведомление отправленно: {{ notification_one.date_create|date:"H:i D d M Y" }}</div>
+        </div>
+        <br>
+    {% endfor %}
+{% endblock %}

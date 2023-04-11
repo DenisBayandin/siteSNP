@@ -41,20 +41,24 @@ class ShowPhotoAdminService(Service):
 
 class UpdateStateOnVerifiedService(Service):
     photo = ModelChoiceField(queryset=Photo.objects.all())
+    user = ModelChoiceField(queryset=User.objects.all())
 
     def process(self):
+        user = self.cleaned_data["user"]
         photo = self.cleaned_data["photo"]
         self.change_state(photo)
-        self.send_notification(photo)
+        self.send_notification(photo, user)
 
     def change_state(self, photo):
         photo.go_state_verified()
         photo.save()
 
-    def send_notification(self, photo):
+    def send_notification(self, photo, user):
         get_user = User.objects.get(id=photo.user_id)
         notification = Notification.objects.create(
-            message=f"Вашу фотографию '{photo.name}' одобрили."
+            sender=user,
+            recipient=get_user,
+            message=f"Вашу фотографию '{photo.name}' одобрили.",
         )
         async_to_sync(channel_layer.group_send)(
             get_user.group_name,
@@ -64,20 +68,24 @@ class UpdateStateOnVerifiedService(Service):
 
 class UpdateStateOnNotVerifiedService(Service):
     photo = ModelChoiceField(queryset=Photo.objects.all())
+    user = ModelChoiceField(queryset=User.objects.all())
 
     def process(self):
+        user = self.cleaned_data["user"]
         photo = self.cleaned_data["photo"]
         self.change_state(photo)
-        self.send_notification(photo)
+        self.send_notification(photo, user)
 
     def change_state(self, photo):
         photo.go_state_not_verified()
         photo.save()
 
-    def send_notification(self, photo):
+    def send_notification(self, photo, user):
         get_user = User.objects.get(id=photo.user_id)
         notification = Notification.objects.create(
-            message=f"Вашу фотографию '{photo.name}' отклонили."
+            sender=user,
+            recipient=get_user,
+            message=f"Вашу фотографию '{photo.name}' отклонили.",
         )
         async_to_sync(channel_layer.group_send)(
             get_user.group_name,
@@ -87,12 +95,14 @@ class UpdateStateOnNotVerifiedService(Service):
 
 class UpdateOldPhotoOnNewPhotoService(Service):
     photo = ModelChoiceField(queryset=Photo.objects.all())
+    user = ModelChoiceField(queryset=Photo.objects.all())
 
     def process(self):
+        user = self.cleaned_data["user"]
         photo = self.cleaned_data["photo"]
         self.change_photo(photo)
         self.change_state(photo)
-        self.send_notification(photo)
+        self.send_notification(photo, user)
 
     def change_state(self, photo):
         photo.go_state_verified()
@@ -102,10 +112,12 @@ class UpdateOldPhotoOnNewPhotoService(Service):
         photo.old_photo = photo.new_photo
         photo.new_photo = None
 
-    def send_notification(self, photo):
+    def send_notification(self, photo, user):
         get_user = User.objects.get(id=photo.user_id)
         notification = Notification.objects.create(
-            message=f"Вам одобрили изменение данных или фотографии '{photo.name}'."
+            sender=user,
+            recipient=get_user,
+            message=f"Вам одобрили изменение данных или фотографии '{photo.name}'.",
         )
         async_to_sync(channel_layer.group_send)(
             get_user.group_name,

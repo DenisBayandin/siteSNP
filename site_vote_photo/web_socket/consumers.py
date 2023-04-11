@@ -24,9 +24,10 @@ def get_photo(photoID):
 
 
 @database_sync_to_async
-def create_notification(sender, photo, type_websoket):
+def create_notification(sender, photo, type_websoket, recipient):
     if type_websoket == "like":
         notification = Notification.objects.create(
+            recipient=recipient,
             sender=sender,
             message=(
                 f'Пользователь {sender} поставил "Мне нравится"'
@@ -36,6 +37,7 @@ def create_notification(sender, photo, type_websoket):
         )
     elif type_websoket == "delete_like":
         notification = Notification.objects.create(
+            recipient=recipient,
             sender=sender,
             message=(
                 f'Пользователь {sender} убрал "Мне нравится"'
@@ -62,7 +64,9 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         photo = await get_photo(int(data["photoID"]))
         user_which_create_photo = await get_user(int(photo.user_id))
         if user != user_which_create_photo:
-            message = await create_notification(user, photo, data["type_websocket"])
+            message = await create_notification(
+                user, photo, data["type_websocket"], user_which_create_photo
+            )
             new_data = {"type": "send_new_data", "message": message}
             await self.channel_layer.group_send(
                 user_which_create_photo.group_name, new_data

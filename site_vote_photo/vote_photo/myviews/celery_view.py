@@ -37,5 +37,7 @@ def delete_photo(request, photoID):
     Отпрвляем увдомление, о том, что комментарий будет удалён,
      так как фотография отправлена на удаление.
     """
-    ServiceDeletePhoto.execute({"photo": get_object_or_404(Photo, id=photoID)})
+    ServiceDeletePhoto.execute(
+        {"photo": get_object_or_404(Photo, id=photoID), "req_user": request.user}
+    )
     return redirect("all_photo")

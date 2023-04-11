@@ -21,6 +21,7 @@ class Notification(models.Model):
         related_name="recipient",
     )
     message = models.CharField(max_length=250, null=True, blank=True)
+    date_create = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "notifications"

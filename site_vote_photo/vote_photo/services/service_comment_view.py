@@ -45,7 +45,10 @@ class SendNotificationCommentService(Service):
 
     def send_notification(self, photo, user):
         get_user_create_photo = User.objects.get(id=photo.user_id)
+        if user == get_user_create_photo:
+            return 0
         notification = Notification.objects.create(
+            recipient=get_user_create_photo,
             sender=user,
             message=(
                 f"Пользователь {user.username} оставил "
