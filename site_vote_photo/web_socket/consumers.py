@@ -55,6 +55,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         user_from_db = await get_user(int(get_pk_user_from_url))
         self.group_name = user_from_db.group_name
         await self.channel_layer.group_add(self.group_name, self.channel_name)
+        await self.channel_layer.group_add("notification_admin", self.channel_name)
         await self.accept()
 
     async def websocket_receive(self, event):
@@ -80,6 +81,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, event):
         await self.channel_layer.group_discard(self.group_name, self.channel_name)
+        await self.channel_layer.group_discard("notification_admin", self.channel_name)
         await self.close()
 
     async def send_notification(self, event):

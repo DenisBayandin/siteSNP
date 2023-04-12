@@ -30,6 +30,7 @@ from .views import (
     update_state_not_verified,
     update_password,
     notification_view,
+    send_notification_all_user,
 )
 
 
@@ -91,4 +92,9 @@ urlpatterns = [
     path("rename_profile/", rename_profile, name="rename_profile"),
     path("update_password/", update_password, name="update_password"),
     path("notification/", notification_view, name="notification_show"),
+    path(
+        "send_notification/all_user/",
+        send_notification_all_user,
+        name="notification_all_user",
+    ),
 ]

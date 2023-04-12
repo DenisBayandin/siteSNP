@@ -146,3 +146,14 @@ def update_photo(request, photoID):
         {"photo": get_object_or_404(Photo, id=photoID), "user": request.user}
     )
     return redirect("photoUpdate")
+
+
+def send_notification_all_user(request):
+    if request.method == "POST":
+        ServiceSendNotificationAllUser.execute(
+            {
+                "message_notification": request.POST["send_notification_all_user"],
+                "user": request.user,
+            }
+        )
+    return redirect("/admin/")

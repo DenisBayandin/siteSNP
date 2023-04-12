@@ -7,6 +7,7 @@ from .myviews.admin_view import (
     update_state_verified,
     update_state_not_verified,
     update_photo,
+    send_notification_all_user,
 )
 from .myviews.celery_view import celery_delete_photo, delete_photo
 from .myviews.comment_view import delete_comment, update_comment
