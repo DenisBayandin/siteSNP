@@ -1,8 +1,6 @@
 from django.dispatch import receiver
 from django.db.models.signals import post_save, post_delete
-from .mymodels.model_comment import Comment
-from .mymodels.model_photo import Photo
-from .mymodels.model_like import Like
+from .models import *
 
 
 @receiver(post_save, sender=Comment)

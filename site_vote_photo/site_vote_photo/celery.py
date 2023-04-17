@@ -1,4 +1,3 @@
-# path/to/your/proj/src/cfehome/celery.py
 import os
 
 from celery import Celery

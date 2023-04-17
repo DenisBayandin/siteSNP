@@ -1,27 +1,26 @@
 from django.urls import path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
-from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework import permissions
 
-from ..view.photo_view import (
+from ..api_view.photo import (
     AllPhotoView,
     СhangeOnePhotoView,
     PhotosUserFilter,
     GetOnePhotoView,
 )
-from ..view.comment_view import (
+from ..api_view.comment import (
     AllCommentOnePhotoView,
     OneCommentView,
     CreateCommentOnePhotoView,
     СhangeOneCommentView,
 )
-from ..view.like_view import AllLikesOnePhotoView, CreateLikeView, ChangeLikeView
-from ..view.user_view import UsersView, DetailUser
-from ..view.refresh_token_view import RefreshTokenView
-from ..view.admin_view import AdminChangingStatePhotoView, AdminUpdatePhotoView
-from ..view.custom_auth_token_view import CustomGetAuthTokenView
+from ..api_view.like import AllLikesOnePhotoView, CreateLikeView, ChangeLikeView
+from ..api_view.user import UsersView, DetailUser
+from ..api_view.refresh_token import RefreshTokenView
+from ..api_view.admin import AdminChangingStatePhotoView, AdminUpdatePhotoView
+from ..api_view.custom_auth_token import CustomGetAuthTokenView
 
 schema_view = get_schema_view(
     openapi.Info(
