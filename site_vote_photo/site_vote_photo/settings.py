@@ -147,7 +147,7 @@ AUTH_USER_MODEL = "vote_photo.User"
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = "static/"
-
+DISABLE_COLLECTSTATIC = 1
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Default primary key field type
