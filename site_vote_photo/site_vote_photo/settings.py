@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 import os.path
 from pathlib import Path
 
-from decouple import config
+from decouple import config  # type: ignore
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,11 +21,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY")
+# SECRET_KEY = config("SECRET_KEY")
+SECRET_KEY = "django-insecure-4rc*nmcs8x)t%3a3l^q3&n41d7p*y0l)0*x(_st_k(zq60)gnl"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
-DEBUG = config("DEBUG", default=0)
+# DEBUG = config("DEBUG", default=0)
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -101,9 +103,9 @@ ASGI_APPLICATION = "site_vote_photo.asgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": config("DB_NAME"),
-        "USER": config("DB_USERNAME"),
-        "PASSWORD": config("DB_PASSWORD"),
+        "NAME": "VotePhotoOne",
+        "USER": "denis",
+        "PASSWORD": "Zxc230104",
         "HOST": "localhost",
         "PORT": "5432",
     }
@@ -176,8 +178,8 @@ AUTHENTICATION_BACKENDS = (
     # аутентификации, чтобы работала авторизация через обычный логин и пароль
 )
 
-SOCIAL_AUTH_VK_OAUTH2_KEY = config("SOCIAL_AUTH_VK_OAUTH2_KEY")
-SOCIAL_AUTH_VK_OAUTH2_SECRET = config("SOCIAL_AUTH_VK_OAUTH2_SECRET")
+SOCIAL_AUTH_VK_OAUTH2_KEY = "51569945"
+SOCIAL_AUTH_VK_OAUTH2_SECRET = "Ge4nVw99YhSCyR83PI7x"
 
 LOGIN_REDIRECT_URL = "/"
 
