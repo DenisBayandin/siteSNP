@@ -96,6 +96,7 @@ werkzeug = "==2.2.3"
 "zope.event" = "==4.6"
 "zope.interface" = "==5.5.2"
 pipfile = "*"
+drf_yasg = "==1.21.5"
 
 [dev-packages]
 django = "==4.1.7"

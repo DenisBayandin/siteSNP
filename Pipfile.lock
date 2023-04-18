@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "60de972c519e63a66c7f3c053b275c0e7182c6b2259ce44ce64d399d03e57e31"
+            "sha256": "1c074db30361bc2657e17ae0c99b84b5ed49611bbbc42567344bb8feb99c5d3d"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -307,6 +307,20 @@
             "index": "pypi",
             "version": "==15.1.0"
         },
+        "coreapi": {
+            "hashes": [
+                "sha256:46145fcc1f7017c076a2ef684969b641d18a2991051fddec9458ad3f78ffc1cb",
+                "sha256:bf39d118d6d3e171f10df9ede5666f63ad80bba9a29a8ec17726a66cf52ee6f3"
+            ],
+            "version": "==2.3.3"
+        },
+        "coreschema": {
+            "hashes": [
+                "sha256:5e6ef7bf38c1525d5e55a895934ab4273548629f16aed5c0a6caa74ebf45551f",
+                "sha256:9503506007d482ab0867ba14724b93c18a33b22b6d19fb419ef2d239dd4a1607"
+            ],
+            "version": "==0.0.4"
+        },
         "cryptography": {
             "hashes": [
                 "sha256:103e8f7155f3ce2ffa0049fe60169878d47a4364b277906386f8de21c9234aa1",
@@ -423,6 +437,14 @@
             ],
             "index": "pypi",
             "version": "==3.14.0"
+        },
+        "drf-yasg": {
+            "hashes": [
+                "sha256:ba9cf4bf79f259290daee9b400fa4fcdb0e78d2f043fa5e9f6589c939fd06d05",
+                "sha256:ceef0c3b5dc4389781afd786e6dc3697af2a2fe0d8724ee1f637c23d75bbc5b2"
+            ],
+            "index": "pypi",
+            "version": "==1.21.5"
         },
         "easy-thumbnails": {
             "hashes": [
@@ -611,6 +633,14 @@
             "index": "pypi",
             "version": "==22.10.0"
         },
+        "inflection": {
+            "hashes": [
+                "sha256:1a29730d366e996aaacffb2f1f1cb9593dc38e2ddd30c91250c6dde09ea9b417",
+                "sha256:f38b2b640938a4f35ade69ac3d053042959b62a0f1076a5bbaa1b9526605a8a2"
+            ],
+            "markers": "python_version >= '3.5'",
+            "version": "==0.5.1"
+        },
         "itsdangerous": {
             "hashes": [
                 "sha256:2c2349112351b88699d8d4b6b075022c0808887cb7ad10069318a8b0bc88db44",
@@ -618,6 +648,13 @@
             ],
             "index": "pypi",
             "version": "==2.1.2"
+        },
+        "itypes": {
+            "hashes": [
+                "sha256:03da6872ca89d29aef62773672b2d408f490f80db48b23079a4b194c86dd04c6",
+                "sha256:af886f129dea4a2a1e3d36595a2d139589e4dd287f5cab0b40e799ee81570ff1"
+            ],
+            "version": "==1.2.0"
         },
         "jinja2": {
             "hashes": [
@@ -772,6 +809,14 @@
             ],
             "index": "pypi",
             "version": "==3.2.2"
+        },
+        "packaging": {
+            "hashes": [
+                "sha256:994793af429502c4ea2ebf6bf664629d07c1a9fe974af92966e4b8d2df7edc61",
+                "sha256:a392980d2b6cffa644431898be54b0045151319d1e7ec34f0cfed48767dd334f"
+            ],
+            "markers": "python_version >= '3.7'",
+            "version": "==23.1"
         },
         "pillow": {
             "hashes": [
@@ -1123,6 +1168,14 @@
             "index": "pypi",
             "version": "==0.1.4"
         },
+        "ruamel.yaml": {
+            "hashes": [
+                "sha256:742b35d3d665023981bd6d16b3d24248ce5df75fdb4e2924e93a05c1f8b61ca7",
+                "sha256:8b7ce697a2f212752a35c1ac414471dc16c424c9573be4926b56ff3f5d23b7af"
+            ],
+            "markers": "python_version >= '3'",
+            "version": "==0.17.21"
+        },
         "send2trash": {
             "hashes": [
                 "sha256:d2c24762fd3759860a0aff155e45871447ea58d2be6bdd39b5c8f966a0c99c2d",
@@ -1226,6 +1279,14 @@
             ],
             "index": "pypi",
             "version": "==2022.7"
+        },
+        "uritemplate": {
+            "hashes": [
+                "sha256:4346edfc5c3b79f694bccd6d6099a322bbeb628dbf2cd86eea55a456ce5124f0",
+                "sha256:830c08b8d99bdd312ea4ead05994a38e8936266f84b9a7878232db50b044e02e"
+            ],
+            "markers": "python_version >= '3.6'",
+            "version": "==4.1.1"
         },
         "urllib3": {
             "hashes": [
