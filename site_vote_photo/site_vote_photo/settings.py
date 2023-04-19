@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os.path
+import dj_database_url  # type: ignore
 from pathlib import Path
 
 from decouple import config  # type: ignore
@@ -22,14 +23,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = config("SECRET_KEY")
-SECRET_KEY = "django-insecure-4rc*nmcs8x)t%3a3l^q3&n41d7p*y0l)0*x(_st_k(zq60)gnl"
+# SECRET_KEY = "django-insecure-4rc*nmcs8x)t%3a3l^q3&n41d7p*y0l)0*x(_st_k(zq60)gnl"
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
 # DEBUG = config("DEBUG", default=0)
 DEBUG = False
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "desolate-lowlands-76954.herokuapp.com"]
 
 # Application definition
 
@@ -51,6 +53,7 @@ INSTALLED_APPS = [
     "channels",
     "web_socket",
     "drf_yasg",
+    "whitenoise.runserver_nostatic",
 ]
 
 REST_FRAMEWORK = {
@@ -69,6 +72,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 INTERNAL_IPS = [
@@ -110,6 +114,8 @@ DATABASES = {
         "PORT": "5432",
     }
 }
+db_from_env = dj_database_url.config(conn_max_age=600)
+DATABASES["default"].update(db_from_env)
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -146,9 +152,12 @@ AUTH_USER_MODEL = "vote_photo.User"
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = "static/"
-DISABLE_COLLECTSTATIC = 1
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+# STATIC_URL = "static/"
+# STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+STATIC_ROOT = os.path.join(BASE_DIR, "assert")
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
