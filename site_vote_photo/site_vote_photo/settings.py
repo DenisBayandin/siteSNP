@@ -31,7 +31,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # DEBUG = config("DEBUG", default=0)
 DEBUG = False
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "desolate-lowlands-76954.herokuapp.com"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "calm-meadow-85037.herokuapp.com"]
 
 # Application definition
 
