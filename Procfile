@@ -1,1 +1,1 @@
-web: gunicorn site_vote_photo.site_vote_photo.wsgi
+web: gunicorn site_vote_photo.site_vote_photo.wsgi site_vote_photo.site_vote_photo.settings
