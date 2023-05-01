@@ -15,14 +15,11 @@
         </div>
     </form>
     <div class="custom_block">
-        <h2><a href="{% url 'photoNotVerified' %}">Фотографии требующие проверки.</a></h2>
+        <h2><a href="{% url 'photo_not_verified' %}">Фотографии требующие проверки.</a></h2>
     </div>
     <div class="custom_block">
-        <h2><a href="{% url 'photoUpdate' %}">Фотографии на обновление.</a></h2>
+        <h2><a href="{% url 'photo_update' %}">Фотографии на обновление.</a></h2>
     </div>
-<!--    <div class="custom_block">-->
-<!--        <h2><a href="{% url 'photoDelete' %}">Фотографии на удаление.</a></h2>-->
-<!--    </div>-->
     <br>
 
     {{ block.super }}

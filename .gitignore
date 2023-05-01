@@ -4,3 +4,4 @@
 media/
 static/
 *.env
+*.mypy_cache

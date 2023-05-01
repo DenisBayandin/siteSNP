@@ -7,9 +7,9 @@
     </p>
     <p>
         Сортировка:
-        <button id="sortingButton" type="button" class="btn btn-outline-light btn-dark" onclick="getPage('{% url 'sortingMain' '-count_like' %}')">По лайкам</button>
-        <button type="button" class="btn btn-outline-light btn-dark" onclick="getPage('{% url 'sortingMain' '-count_comment' %}')">По комментариям</button>
-        <button type="button" class="btn btn-outline-light btn-dark" onclick="getPage('{% url 'sortingMain' '-date_create' %}')">По дате публикации</button>
+        <button id="sortingButton" type="button" class="btn btn-outline-light btn-dark" onclick="getPage('{% url 'sorting_main' '-count_like' %}')">По лайкам</button>
+        <button type="button" class="btn btn-outline-light btn-dark" onclick="getPage('{% url 'sorting_main' '-count_comment' %}')">По комментариям</button>
+        <button type="button" class="btn btn-outline-light btn-dark" onclick="getPage('{% url 'sorting_main' '-date_create' %}')">По дате публикации</button>
     </p>
     <div id="postsElem">
         {% for p in photo %}
@@ -68,7 +68,7 @@
                                     <div class="d-flex flex-start">
                                         {% if checking_photo %}
                                             <img class="rounded-circle shadow-1-strong me-3"
-                                            src="{{comment.user.photo_by_user.url}}" alt="avatar" width="65"
+                                            src="{{ comment.user.photo_by_user.url }}" alt="avatar" width="65"
                                             height="65" />
                                         {% else %}
                                             <img class="rounded-circle shadow-1-strong me-3"
@@ -120,7 +120,7 @@
             if (event.key == "Enter"){
             console.log("Click ENTER");
             let whatWrote = document.getElementById('searchInput').value;
-            url = "searchMain/" + whatWrote;
+            url = "search_main/" + whatWrote;
             let response = await fetch(url)
             if (response.ok){
                 console.log("Worked AJAX in sorting photo");
@@ -138,7 +138,7 @@
             console.log(photo_id);
             let likeCountElement = document.getElementById('LikeAndNoLike' + photo_id);
             response = await fetch(
-                {% url 'addlike' %},
+                {% url 'add_like' %},
                     {
                         method: "POST",
                         body: JSON.stringify({photoID: photo_id}),

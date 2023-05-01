@@ -1,4 +1,4 @@
-from .view.admin import (
+from .view.admin.admin import (
     ViewPhotoNotVerified,
     ViewPhotoUpdate,
     ViewPhotoDelete,
@@ -9,22 +9,22 @@ from .view.admin import (
     update_photo,
     send_notification_all_user,
 )
-from .view.celery_view import celery_delete_photo, delete_photo
-from .view.comment import delete_comment, update_comment
-from .view.like import add_like
-from .view.one_photo import (
+from .view.celery.celery_view import celery_delete_photo, delete_photo
+from .view.comment.comment import delete_comment, update_comment
+from .view.like.like import add_like
+from .view.photo.photo_one import (
     show_one_photo,
     loading_new_photo,
     cancel_delete_photo,
 )
-from .view.photo_one_user import SortedAllPhotoOneUser, view_all_photo
-from .view.photo import MainView, MainSortedView, MainSearchView
-from .view.reg_aut_login import (
+from .view.photo.photo_user import SortedAllPhotoOneUser, view_all_photo
+from .view.photo.photo import MainView, MainSortedView, MainSearchView
+from .view.auth.auth import (
     RegisterUser,
     LoginUser,
     profile,
     logout_view,
     update_password,
 )
-from .view.rename import rename_token, rename_profile
-from .view.notification import notification_view
+from .view.update.update_data import update_token, update_data_profile
+from .view.notification.notification import notification_view

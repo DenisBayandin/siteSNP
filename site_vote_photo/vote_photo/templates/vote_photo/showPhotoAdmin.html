@@ -19,13 +19,13 @@
     <h2>Имя фотографии: {{ photo.name }}</h2>
     <h2>Описание фотографии: {{ photo.content }}</h2>
     <p>
-        <form method="post" action="{% url 'updateStateVerified' photo.id %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-light">Фотография прошла проверку</button>
+        <form method="post" action="{% url 'update_state_verified' photo.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-light">Фотография прошла проверку</button>
         </form>
     </p>
     <p>
-        <form method="post" action="{% url 'updateStateNotVerified' photo.id %}">
+        <form method="post" action="{% url 'update_state_not_verified' photo.id %}">
             {% csrf_token %}
             <button type="submit" class="btn btn-light">Фотография не прошла проверку</button>
         </form>

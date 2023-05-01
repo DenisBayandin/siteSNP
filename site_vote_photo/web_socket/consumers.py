@@ -4,7 +4,7 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth.models import AnonymousUser
 
-from vote_photo.models import User, Photo, Notification
+from vote_photo.models import User, Photo, Notification  # type: ignore
 
 
 @database_sync_to_async

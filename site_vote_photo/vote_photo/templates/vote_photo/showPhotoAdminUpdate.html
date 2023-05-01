@@ -15,18 +15,18 @@
 {% block nav-sidebar %}{% endblock %}
 
 {% block content %}
-    <div>Старая фотография (фотография которую хотят заменить):<br><img src="{{ photo.photo_510x510.url }}" style="margin-bottom: 10px;"><br><br>
-    Новая фотография (фотография на которую хотят заменить):<br><img src="{{ photo.new_photo.url }}" width="510" height="319"></div>
+    <div>Старая фотография (фотография которую хотят заменить):<br><img src="{{ photo.photo_510x510.url }}" style="margin-bottom: 10px;" width="510" height="510"><br><br>
+    Новая фотография (фотография на которую хотят заменить):<br><img src="{{ photo.new_photo.url }}" width="510" height="510"></div>
     <h2>Имя фотографии: {{ photo.name }}</h2>
     <h2>Описание фотографии: {{ photo.content }}</h2>
     <p>
-        <form method="post" action="{% url 'updatePhotoInAdmin' photo.id %}">
+        <form method="post" action="{% url 'update_photo_in_admin' photo.id %}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-light">Заменить фотографию</button>
         </form>
     </p>
     <p>
-        <form method="post" action="{% url 'updateStateNotVerified' photo.id %}">
+        <form method="post" action="{% url 'update_state_not_verified' photo.id %}">
             {% csrf_token %}
             <button type="submit" class="btn btn-light">Фотография не прошла проверку</button>
         </form>

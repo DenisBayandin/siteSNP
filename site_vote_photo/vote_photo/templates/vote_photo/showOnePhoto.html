@@ -238,7 +238,7 @@
         console.log(photo_id);
         let likeCountElement = document.getElementById('LikeAndNoLike' + photo_id);
         response = await fetch(
-            {% url 'addlike' %},
+            {% url 'add_like' %},
             {
             method: "POST",
             body: JSON.stringify({photoID: photo_id}),

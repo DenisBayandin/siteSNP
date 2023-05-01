@@ -8,10 +8,10 @@ from rest_framework.views import APIView
 
 class CustomGetAuthTokenView(APIView):
     @swagger_auto_schema(
-        tags=["token"],
+        tags=["Token"],
         operation_description="If the user has logged into the session, then we just get a TOKEN, otherwise BAD REQUEST",
     )
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         if request.user == AnonymousUser():
             return Response(
                 {

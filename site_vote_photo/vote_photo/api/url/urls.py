@@ -3,6 +3,7 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework import permissions
+from rest_framework.authtoken.views import obtain_auth_token
 
 from ..api_view.photo import (
     AllPhotoView,
@@ -16,7 +17,7 @@ from ..api_view.comment import (
     CreateCommentOnePhotoView,
     СhangeOneCommentView,
 )
-from ..api_view.like import AllLikesOnePhotoView, CreateLikeView, ChangeLikeView
+from ..api_view.like import AllLikesOnePhotoView, CreateLikeView
 from ..api_view.user import UsersView, DetailUser
 from ..api_view.refresh_token import RefreshTokenView
 from ..api_view.admin import AdminChangingStatePhotoView, AdminUpdatePhotoView
@@ -35,22 +36,19 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("photos/", AllPhotoView.as_view()),
-    path("photos/one_photo/get/<int:photo_id>/", GetOnePhotoView.as_view()),
-    path("photos/one_photo/change/<int:id>/", СhangeOnePhotoView.as_view()),
+    path("photos/<int:photo_id>/", GetOnePhotoView.as_view()),
+    path("photos/<int:id>/", СhangeOnePhotoView.as_view()),
+    path("photos/<str:filter>/", PhotosUserFilter.as_view()),
     path("users/", UsersView.as_view()),
-    path("users/one_user/<int:user_id>/", DetailUser.as_view()),
-    path("login/", CustomGetAuthTokenView.as_view()),
-    path("login/refresh_token/", RefreshTokenView.as_view()),
-    path("user/photos/<str:filter>/", PhotosUserFilter.as_view()),
-    path("comments/create/photos/<int:photo_id>/", CreateCommentOnePhotoView.as_view()),
-    path(
-        "comments/one_comment/change/<int:comment_id>/", СhangeOneCommentView.as_view()
-    ),
-    path("comments/view_all_comment/<int:photo_id>/", AllCommentOnePhotoView.as_view()),
-    path("comments/view_one_comment/<int:comment_id>/", OneCommentView.as_view()),
-    path("likes/all_likes/photo/<int:photo_id>/", AllLikesOnePhotoView.as_view()),
-    path("likes/create_like/photo/<int:photo_id>/", CreateLikeView.as_view()),
-    path("likes/change_like/photo/<int:photo_id>/", ChangeLikeView.as_view()),
+    path("users/<int:user_id>/", DetailUser.as_view()),
+    path("token/", CustomGetAuthTokenView.as_view()),
+    path("token/refresh/", RefreshTokenView.as_view()),
+    path("comment/<int:photo_id>/", CreateCommentOnePhotoView.as_view()),
+    path("comment/<int:comment_id>/", СhangeOneCommentView.as_view()),
+    path("comments/<int:photo_id>/", AllCommentOnePhotoView.as_view()),
+    path("comment/<int:one_comment_id>/", OneCommentView.as_view()),
+    path("likes/<int:photo_id>/", AllLikesOnePhotoView.as_view()),
+    path("like/<int:photo_id>/", CreateLikeView.as_view()),
     path(
         "admin/changing_state/<str:state>/<int:photo_id>/",
         AdminChangingStatePhotoView.as_view(),

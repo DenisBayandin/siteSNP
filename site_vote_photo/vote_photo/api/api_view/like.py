@@ -49,17 +49,6 @@ class CreateLikeView(APIView):
             status=status.HTTP_204_NO_CONTENT,
         )
 
-
-class ChangeLikeView(APIView):
-    permission_classes = (IsAuthenticated,)
-    authentication_classes = (TokenAuthentication,)
-
-    @swagger_auto_schema(tags=["Like"], operation_description="Get one like.")
-    def get(self, request, photo_id, format=None):
-        like = Like.objects.get(photo=photo_id, user=request.user.id)
-        serializers = LikeSerializers(like)
-        return Response(serializers.data, status=status.HTTP_200_OK)
-
     @swagger_auto_schema(tags=["Like"], operation_description="Delete ")
     def delete(self, request, photo_id, format=None):
         try:

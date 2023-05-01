@@ -1,1 +1,7 @@
+release: python manage.py makemigrations
+release: python manage.py migrate
 web: gunicorn site_vote_photo.wsgi
+web: daphne site_vote_photo.asgi:application --port $PORT --bind 0.0.0.0 -v2
+celery: celery -A site_vote_photo.celery worker --pool=solo -l info
+celerybeat: celery -A site_vote_photo beat -l INFO
+celeryworker2: celery -A site_vote_photo.celery worker --concurrency=2 & celery -A site_vote_photo beat -l info & wait -n

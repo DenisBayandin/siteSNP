@@ -22,16 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = config("SECRET_KEY")
-# SECRET_KEY = "django-insecure-4rc*nmcs8x)t%3a3l^q3&n41d7p*y0l)0*x(_st_k(zq60)gnl"
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-# DEBUG = config("DEBUG", default=0)
-DEBUG = False
+DEBUG = os.environ.get("DEBUG", False)
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "calm-meadow-85037.herokuapp.com"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "lit-refuge-13907.herokuapp.com"]
 
 # Application definition
 
@@ -54,6 +50,9 @@ INSTALLED_APPS = [
     "web_socket",
     "drf_yasg",
     "whitenoise.runserver_nostatic",
+    "cloudinary_storage",
+    "cloudinary",
+    "corsheaders",
 ]
 
 REST_FRAMEWORK = {
@@ -67,6 +66,7 @@ REST_FRAMEWORK = {
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -152,34 +152,35 @@ AUTH_USER_MODEL = "vote_photo.User"
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-# STATIC_URL = "static/"
-# STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
-STATIC_ROOT = os.path.join(BASE_DIR, "assert")
-
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
 
-# # Celery settings
-# result_backend = 'db+postgresql://scott:tiger@localhost/VotePhotoTwo'
+DEFAULT_FILE_STORAGE = os.environ.get("DEFAULT_FILE_STORAGE")
+
+# Celery settings
 CELERY_RESULT_BACKEND = "django-db"
 
-CELERY_BROKER_URL = config("CELERY_BROKER_REDIS_URL", default="redis://localhost:6379")
+CELERY_BROKER_URL = os.environ["REDIS_URL"]
+
+BROKER_TRANSPORT_OPTIONS = {
+    "max_connections": 2,
+}
+
+BROKER_POOL_LIMIT = None
 
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers.DatabaseScheduler"
 
-# CELERY_BROKER_URL = "redis://127.0.0.1:6379"
-
 # настройка авторизации через вк
 
-SOCIAL_AUTH_POSTGRES_JSONFIELD = True
+SOCIAL_AUTH_JSONFIELD_ENABLED = True
 
 AUTHENTICATION_BACKENDS = (
     "social_core.backends.vk.VKOAuth2",  # бекенд авторизации через ВКонтакте
@@ -200,7 +201,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [os.environ.get("REDIS_URL", "redis://localhost:6379")],
         },
     },
 }
@@ -214,3 +215,45 @@ SWAGGER_SETTINGS = {
     "LOGIN_URL": "rest_framework:login",
     # "LOGIN_URL": '/api/login/',
 }
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+
+# CSRF_TRUSTED_ORIGINS = [
+#     'lit-refuge-13907.herokuapp.com'
+# ]
+
+CORS_EXPOSE_HEADERS = ["Content-Type", "X-CSRFToken"]
+
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
+# Settings cloudinary
+
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": os.environ.get("CLOUD_NAME"),
+    "API_KEY": os.environ.get("API_KEY"),
+    "API_SECRET": os.environ.get("API_SECRET"),
+    "CLOUDINARY_URL": os.environ.get("CLOUDINARY_URL"),
+}
+
+# Settings get CSRF_TOKEN

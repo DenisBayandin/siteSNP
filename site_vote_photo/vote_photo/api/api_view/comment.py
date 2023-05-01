@@ -30,8 +30,8 @@ class OneCommentView(APIView):
         return get_object_or_404(Comment, id=comment_id)
 
     @swagger_auto_schema(tags=["Comment"], operation_description="View one comment.")
-    def get(self, request, comment_id, format=None):
-        comment = self.get_objects(comment_id)
+    def get(self, request, one_comment_id, format=None):
+        comment = self.get_objects(one_comment_id)
         serializers = CommentSerializers(comment)
         return Response(serializers.data, status=status.HTTP_200_OK)
 
@@ -75,7 +75,7 @@ class СhangeOneCommentView(APIView):
         tags=["Comment"],
         operation_description="Changing the comment data.",
     )
-    def put(self, request, comment_id, format=None):
+    def patch(self, request, comment_id, format=None):
         comment = self.get_objects(comment_id)
         if self.verification_of_credentials(request, comment):
             serializers = CommentSerializers(comment, data=request.data)

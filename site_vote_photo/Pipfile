@@ -111,6 +111,11 @@ packaging = "==23.0"
 toml = "==0.10.2"
 uritemplate = "==4.1.1"
 whitenoise = "==6.4.0"
+cloudinary = "==1.32.0"
+dj3-cloudinary-storage = "==0.0.6"
+django-cloudinary-storage = "==0.3.0"
+sorl-thumbnail = "==12.9.0"
+django-cors-headers = "==3.14.0"
 
 [dev-packages]
 django = "==4.1.7"

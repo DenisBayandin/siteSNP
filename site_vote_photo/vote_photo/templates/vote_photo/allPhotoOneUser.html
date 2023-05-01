@@ -3,12 +3,12 @@
 {% block content %}
     <p>
         Сортировка:
-        <button id="sortingButton" type="button" class="btn btn-outline-light btn-dark" onclick="sortedPhoto('{% url 'sortingAllPhotoOneUser' 'Verified' %}')">Проверенные фотографии</button>
-        <button type="button" class="btn btn-outline-light btn-dark" onclick="sortedPhoto('{% url 'sortingAllPhotoOneUser' 'On check' %}')">Фотографии на проверке</button>
-        <button type="button" class="btn btn-outline-light btn-dark" onclick="sortedPhoto('{% url 'sortingAllPhotoOneUser' 'Not verified' %}')">Не проверенные фотографии</button>
-        <button type="button" class="btn btn-outline-light btn-dark" onclick="sortedPhoto('{% url 'sortingAllPhotoOneUser' 'Delete' %}')">Фотографии на удаление</button>
-        <button type="button" class="btn btn-outline-light btn-dark" onclick="sortedPhoto('{% url 'sortingAllPhotoOneUser' 'Update' %}')">Фотографии на обновление</button>
-        <button type="button" class="btn btn-outline-light btn-dark" onclick="sortedPhoto('{% url 'sortingAllPhotoOneUser' 'All photo' %}')">Все фотографии</button>
+        <button id="sortingButton" type="button" class="btn btn-outline-light btn-dark" onclick="sortedPhoto('{% url 'sorting_all_photo_one_user' 'Verified' %}')">Проверенные фотографии</button>
+        <button type="button" class="btn btn-outline-light btn-dark" onclick="sortedPhoto('{% url 'sorting_all_photo_one_user' 'On check' %}')">Фотографии на проверке</button>
+        <button type="button" class="btn btn-outline-light btn-dark" onclick="sortedPhoto('{% url 'sorting_all_photo_one_user' 'Not verified' %}')">Не проверенные фотографии</button>
+        <button type="button" class="btn btn-outline-light btn-dark" onclick="sortedPhoto('{% url 'sorting_all_photo_one_user' 'Delete' %}')">Фотографии на удаление</button>
+        <button type="button" class="btn btn-outline-light btn-dark" onclick="sortedPhoto('{% url 'sorting_all_photo_one_user' 'Update' %}')">Фотографии на обновление</button>
+        <button type="button" class="btn btn-outline-light btn-dark" onclick="sortedPhoto('{% url 'sorting_all_photo_one_user' 'All photo' %}')">Все фотографии</button>
     </p>
     <div id="photoOneUser">
         <h1 class="text-center">Ваши фотографии</h1>
@@ -26,7 +26,7 @@
                         </button>
                         {% if photo_one.state == 'Delete' %}
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-                                <li><a class="dropdown-item" href="{% url 'cancelDeletePhoto' photo_one.id %}">Отменить удаление фотографии.</a></li>
+                                <li><a class="dropdown-item" href="{% url 'cancle_delete_photo' photo_one.id %}">Отменить удаление фотографии.</a></li>
                             </ul>
                         {% else %}
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">

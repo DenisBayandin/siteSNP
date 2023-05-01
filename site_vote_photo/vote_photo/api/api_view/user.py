@@ -52,12 +52,6 @@ class DetailUser(APIView):
     def get_objects(self, user_id):
         return get_object_or_404(User, id=user_id)
 
-    @swagger_auto_schema(tags=["User"], operation_description="View one user.")
-    def get(self, request, user_id, format=None):
-        user = self.get_objects(user_id)
-        serializers = UserSerializers(user)
-        return Response(serializers.data, status=status.HTTP_200_OK)
-
     @swagger_auto_schema(
         request_body=ChangeUserYesPassword,
         tags=["User"],

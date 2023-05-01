@@ -8,6 +8,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
+import requests
 
 from vote_photo.models import User
 from ..serializers.refresh_token import RefreshTokenSerializers
@@ -20,10 +21,10 @@ class RefreshTokenView(APIView):
 
     @swagger_auto_schema(
         request_body=RefreshTokenSerializers,
-        tags=["token"],
+        tags=["Token"],
         operation_description="Refresh TOKEN.",
     )
-    def put(self, request, format=None):
+    def Ф(self, request, format=None):
         try:
             user_get_request = User.objects.get(username=request.data["username"])
             if check_password(request.data["password"], user_get_request.password):
