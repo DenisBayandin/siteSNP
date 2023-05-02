@@ -1,5 +1,5 @@
-from vote_photo.model.photo.photo import Photo
-from vote_photo.model.user.user import User
+from vote_photo.models.photo.photo import Photo
+from vote_photo.models.user.user import User
 
 from django.db import models
 

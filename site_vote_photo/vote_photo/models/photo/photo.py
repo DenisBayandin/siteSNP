@@ -2,7 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django_fsm import FSMField, transition
 
-from vote_photo.model.user.user import User
+from vote_photo.models.user.user import User
 
 
 class Photo(models.Model):

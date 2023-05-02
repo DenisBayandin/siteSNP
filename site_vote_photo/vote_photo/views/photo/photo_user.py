@@ -1,7 +1,7 @@
 from django.views.generic import ListView
 
 from vote_photo.models import Photo
-from vote_photo.view.update.update_token_by_vk import rename_lifetime_token_vk
+from vote_photo.views.update.update_token_by_vk import rename_lifetime_token_vk
 from django.shortcuts import render, redirect
 
 from vote_photo.services.photo.sorted_photo_one_user import ServiceSortedPhotoOneUser

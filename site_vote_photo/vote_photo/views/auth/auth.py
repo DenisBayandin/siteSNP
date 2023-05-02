@@ -15,7 +15,7 @@ from vote_photo.forms import (
     AddPhotoForm,
     UpdatePasswordForm,
 )
-from vote_photo.view.update.update_token_by_vk import rename_lifetime_token_vk
+from vote_photo.views.update.update_token_by_vk import rename_lifetime_token_vk
 from vote_photo.services.photo.get_photo_from_vk import (
     ProfileGetPhotoFromVkService,
 )
