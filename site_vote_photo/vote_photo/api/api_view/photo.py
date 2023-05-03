@@ -8,13 +8,14 @@ from rest_framework.response import Response
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 
-
+from ...services.photo.save_photo_with_new_size import NewSizePhotoService
 from vote_photo.models import Photo
 from ..serializers.photo import (
     AllPhotoSerializers,
     LoadPhotoSerializers,
     UpdatePhotoYesPhotoSerializers,
     UpdatePhotoNoPhotoSerializers,
+    UpdatePhotoSerializers,
 )
 
 
@@ -38,11 +39,12 @@ class AllPhotoView(APIView):
         operation_description="Creating a photo.",
     )
     def post(self, request, format=None, *args, **kwargs):
-        serializer = LoadPhotoSerializers(
-            data=(request.data.dict() | {"user": request.user.id})
-        )
+        serializer = LoadPhotoSerializers(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            NewSizePhotoService.execute(
+                {"photo": Photo.objects.get(name=serializer.data["name"])}
+            )
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -68,11 +70,11 @@ class СhangeOnePhotoView(APIView):
         return Response(serializers.data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
-        request_body=LoadPhotoSerializers,
+        request_body=UpdatePhotoSerializers,
         tags=["Photo"],
         operation_description="Changing the data of the photo or the photo itself.",
     )
-    def put(self, request, id, format=None):
+    def patch(self, request, id, format=None):
         photo = self.get_objects(id)
         if request.user.id == photo.user.id:
             try:

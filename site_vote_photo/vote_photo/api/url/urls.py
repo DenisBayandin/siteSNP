@@ -37,16 +37,15 @@ schema_view = get_schema_view(
 urlpatterns = [
     path("photos/", AllPhotoView.as_view()),
     path("photos/<int:photo_id>/", GetOnePhotoView.as_view()),
-    path("photos/<int:id>/", СhangeOnePhotoView.as_view()),
+    path("photos/update/<int:id>/", СhangeOnePhotoView.as_view()),
     path("photos/<str:filter>/", PhotosUserFilter.as_view()),
     path("users/", UsersView.as_view()),
     path("users/<int:user_id>/", DetailUser.as_view()),
     path("token/", CustomGetAuthTokenView.as_view()),
     path("token/refresh/", RefreshTokenView.as_view()),
     path("comment/<int:photo_id>/", CreateCommentOnePhotoView.as_view()),
-    path("comment/<int:comment_id>/", СhangeOneCommentView.as_view()),
+    path("comment/update/<int:comment_id>/", СhangeOneCommentView.as_view()),
     path("comments/<int:photo_id>/", AllCommentOnePhotoView.as_view()),
-    path("comment/<int:one_comment_id>/", OneCommentView.as_view()),
     path("likes/<int:photo_id>/", AllLikesOnePhotoView.as_view()),
     path("like/<int:photo_id>/", CreateLikeView.as_view()),
     path(

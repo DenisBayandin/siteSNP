@@ -14,7 +14,7 @@ class Photo(models.Model):
     photo_delete = models.ImageField(
         blank=True, null=True, upload_to="delete_photos/%Y/%m/%d"
     )
-    new_photo = models.ImageField(blank=False, upload_to="new_photos/%Y/%m/%d")
+    new_photo = models.ImageField(blank=True, upload_to="new_photos/%Y/%m/%d")
     old_photo = models.ImageField(blank=True, upload_to="old_photos/%Y/%m/%d")
     photo_145x165 = models.ImageField(blank=True, upload_to="photos_145x165/%Y/%m/%d")
     photo_510x510 = models.ImageField(blank=True, upload_to="photos_510x510/%Y/%m/%d")

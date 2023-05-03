@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-
+from ...services.photo.save_photo_with_new_size import NewSizePhotoService
 from vote_photo.models import Photo
 from ..serializers.photo import AllPhotoSerializers
 
@@ -87,7 +87,11 @@ class AdminUpdatePhotoView(APIView):
             photo.new_photo = None
             photo.go_state_verified()
             photo.save()
-            return Response(AllPhotoSerializers(photo), status=status.HTTP_200_OK)
+            NewSizePhotoService.execute({"photo": Photo.objects.get(id=photo_id)})
+            return Response(
+                {"message": "Фотография обновлена.", "status": status.HTTP_200_OK},
+                status=status.HTTP_200_OK,
+            )
         return Response(
             {
                 "error": f"Фотография '{photo.name}' не находится в состояние 'update'.",
