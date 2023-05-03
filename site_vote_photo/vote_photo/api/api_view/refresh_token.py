@@ -24,7 +24,7 @@ class RefreshTokenView(APIView):
         tags=["Token"],
         operation_description="Refresh TOKEN.",
     )
-    def Ф(self, request, format=None):
+    def post(self, request, format=None):
         try:
             user_get_request = User.objects.get(username=request.data["username"])
             if check_password(request.data["password"], user_get_request.password):
