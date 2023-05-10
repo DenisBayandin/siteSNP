@@ -31,7 +31,7 @@ SECRET_KEY = "django-insecure-4rc*nmcs8x)t%3a3l^q3&n41d7p*y0l)0*x(_st_k(zq60)gnl
 # DEBUG = config("DEBUG", default=0)
 DEBUG = False
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "calm-meadow-85037.herokuapp.com"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "lit-refuge-13907.herokuapp.com"]
 
 # Application definition
 
@@ -118,8 +118,8 @@ DATABASES = {
         "PORT": "5432",
     }
 }
-# db_from_env = dj_database_url.config(conn_max_age=600)
-# DATABASES["default"].update(db_from_env)
+db_from_env = dj_database_url.config(conn_max_age=600)
+DATABASES["default"].update(db_from_env)
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -159,8 +159,7 @@ AUTH_USER_MODEL = "vote_photo.User"
 # STATIC_URL = "static/"
 # STATIC_ROOT = os.path.join(BASE_DIR, "static")
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
-STATIC_ROOT = os.path.join(BASE_DIR, "assert")
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 
 # Default primary key field type
@@ -175,7 +174,7 @@ MEDIA_URL = "/media/"
 # result_backend = 'db+postgresql://scott:tiger@localhost/VotePhotoTwo'
 CELERY_RESULT_BACKEND = "django-db"
 
-CELERY_BROKER_URL = config("CELERY_BROKER_REDIS_URL", default="redis://localhost:6379")
+CELERY_BROKER_URL = config("REDIS_URL")
 
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers.DatabaseScheduler"
 
