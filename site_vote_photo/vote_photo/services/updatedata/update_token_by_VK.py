@@ -1,5 +1,5 @@
 from service_objects.services import Service
-from django.forms import ModelChoiceField
+from service_objects.fields import ModelField
 from datetime import timedelta
 from django.utils import timezone
 
@@ -8,7 +8,7 @@ from vote_photo.models import User
 
 
 class ServiceRenameLifetimeTokenVk(Service):
-    user = ModelChoiceField(queryset=User.objects.all())
+    user = ModelField(User)
 
     def process(self):
         if self.cleaned_data["user"].photo_by_user.name == "":

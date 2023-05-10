@@ -1,11 +1,11 @@
 from service_objects.services import Service
-from django.forms import ModelChoiceField
+from service_objects.fields import ModelField
 
 from vote_photo.models import *
 
 
 class ShowPhotoAdminService(Service):
-    photo = ModelChoiceField(queryset=Photo.objects.all())
+    photo = ModelField(Photo)
 
     def process(self):
         return_photo = self.change_state(self.cleaned_data["photo"])

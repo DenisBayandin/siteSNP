@@ -1,5 +1,5 @@
 from service_objects.services import Service
-from django.forms import ModelChoiceField
+from service_objects.fields import ModelField
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from PIL import Image as Img
 
@@ -9,7 +9,7 @@ from vote_photo.models import *
 
 
 class NewSizePhotoService(Service):
-    photo = ModelChoiceField(queryset=Photo.objects.all())
+    photo = ModelField(Photo)
 
     def process(self):
         self.new_photo_size_510_510(self.cleaned_data["photo"])

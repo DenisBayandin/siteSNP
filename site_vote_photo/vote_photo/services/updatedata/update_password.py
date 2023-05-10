@@ -1,5 +1,5 @@
 from service_objects.services import Service
-from django.forms import ModelChoiceField
+from service_objects.fields import ModelField
 from django import forms
 from django.contrib.auth.hashers import check_password
 from django.core.exceptions import ValidationError
@@ -12,7 +12,7 @@ class ServiceUpdatePassword(Service):
     password = forms.CharField()
     new_password = forms.CharField()
     new_password2 = forms.CharField()
-    user = ModelChoiceField(queryset=User.objects.all())
+    user = ModelField(User)
 
     def process(self):
         self.check_password(

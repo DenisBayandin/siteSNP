@@ -1,7 +1,7 @@
 import vk
 
 from service_objects.services import Service
-from django.forms import ModelChoiceField
+from service_objects.fields import ModelField
 
 from vote_photo.models import User
 
@@ -10,7 +10,7 @@ version_vk_api = "5.131"
 
 
 class ProfileGetPhotoFromVkService(Service):
-    user = ModelChoiceField(queryset=User.objects.all())
+    user = ModelField(User)
 
     def process(self):
         self.get_photo_from_vkontakte(self.cleaned_data["user"])

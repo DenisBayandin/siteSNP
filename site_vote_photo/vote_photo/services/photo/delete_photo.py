@@ -1,5 +1,5 @@
 from service_objects.services import Service
-from django.forms import ModelChoiceField
+from service_objects.fields import ModelField
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from datetime import datetime, timedelta
@@ -11,25 +11,28 @@ channel_layer = get_channel_layer()
 
 
 class ServiceDeletePhoto(Service):
-    photo = ModelChoiceField(queryset=Photo.objects.all())
-    req_user = ModelChoiceField(queryset=User.objects.all())
+    photo = ModelField(Photo)
+    user = ModelField(User)
 
     def process(self):
         self.change_data_photo_and_state_photo(self.cleaned_data["photo"])
+        self.check_and_send_notification()
+
+    def check_and_send_notification(self):
         check_send_notification = []
         for comment in Comment.objects.filter(photo_id=self.cleaned_data["photo"].id):
             get_user = User.objects.get(id=comment.user_id)
             if get_user.id in check_send_notification:
                 continue
             else:
-                if self.cleaned_data["req_user"] == get_user:
+                if self.cleaned_data["user"] == get_user:
                     continue
                 try:
                     self.send_notification(
                         self.cleaned_data["photo"],
                         get_user,
                         check_send_notification,
-                        self.cleaned_data["req_user"],
+                        self.cleaned_data["user"],
                     )
                     self.cleaned_data["photo"].save()
                 except TypeError:

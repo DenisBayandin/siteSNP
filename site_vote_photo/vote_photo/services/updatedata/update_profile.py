@@ -1,5 +1,5 @@
 from service_objects.services import Service
-from django.forms import ModelChoiceField
+from service_objects.fields import ModelField
 from django import forms
 
 from vote_photo.models import *
@@ -11,7 +11,7 @@ class ServiceRenameProfile(Service):
     last_name = forms.CharField()
     patronymic = forms.CharField()
     email = forms.CharField()
-    user = ModelChoiceField(queryset=User.objects.all())
+    user = ModelField(User)
 
     def process(self):
         user = self.cleaned_data["user"]

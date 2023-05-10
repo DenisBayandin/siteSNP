@@ -1,6 +1,6 @@
 from channels.layers import get_channel_layer
 from service_objects.services import Service
-from django.forms import ModelChoiceField
+from service_objects.fields import ModelField
 from asgiref.sync import async_to_sync
 
 from vote_photo.models import *
@@ -10,8 +10,8 @@ channel_layer = get_channel_layer()
 
 
 class SendNotificationCommentService(Service):
-    photo = ModelChoiceField(queryset=Photo.objects.all())
-    user = ModelChoiceField(queryset=User.objects.all())
+    photo = ModelField(Photo)
+    user = ModelField(User)
 
     def process(self):
         self.send_notification(self.cleaned_data["photo"], self.cleaned_data["user"])

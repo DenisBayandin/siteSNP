@@ -3,8 +3,6 @@ from rest_framework import serializers
 from django.core.exceptions import ValidationError
 
 from vote_photo.models import User
-from rest_framework.authtoken.models import Token
-from ..api_service.register_user import UserRegisterService
 
 
 class UserRegisterSerializers(serializers.ModelSerializer):
@@ -12,6 +10,7 @@ class UserRegisterSerializers(serializers.ModelSerializer):
     first_name = serializers.CharField(required=True)
     last_name = serializers.CharField(required=True)
     email = serializers.CharField(required=True)
+    patronymic = serializers.CharField(required=True)
 
     class Meta:
         model = User

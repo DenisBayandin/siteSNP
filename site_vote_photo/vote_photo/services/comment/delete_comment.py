@@ -1,13 +1,13 @@
 from service_objects.services import Service
-from django.forms import ModelChoiceField
+from service_objects.fields import ModelField
 from django.core.exceptions import ValidationError
 
 from vote_photo.models import *
 
 
 class DeleteCommentService(Service):
-    comment = ModelChoiceField(queryset=Comment.objects.all())
-    user = ModelChoiceField(queryset=User.objects.all())
+    comment = ModelField(Comment)
+    user = ModelField(User)
 
     def process(self):
         self.check_children_comment(

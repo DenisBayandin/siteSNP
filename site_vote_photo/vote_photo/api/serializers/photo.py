@@ -10,6 +10,8 @@ class AllPhotoSerializers(serializers.ModelSerializer):
             "id",
             "name",
             "content",
+            "old_photo",
+            "new_photo",
             "date_create",
             "count_like",
             "count_comment",
@@ -19,7 +21,9 @@ class AllPhotoSerializers(serializers.ModelSerializer):
 
 
 class LoadPhotoSerializers(serializers.ModelSerializer):
-    name = serializers.CharField(required=False)
+    name = serializers.CharField(required=True)
+    content = serializers.CharField(required=True)
+    old_photo = serializers.ImageField(required=True)
 
     class Meta:
         model = Photo

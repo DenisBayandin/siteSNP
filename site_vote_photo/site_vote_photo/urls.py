@@ -7,7 +7,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("vote_photo.urls")),
     path("login/vk/", include("social_django.urls")),
-    path("api/", include("vote_photo.api.url.urls")),
+    path("api/", include("vote_photo.api.urls")),
     path("api-auth/", include("rest_framework.urls")),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

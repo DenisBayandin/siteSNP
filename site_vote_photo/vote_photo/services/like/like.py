@@ -1,13 +1,13 @@
 from service_objects.services import Service
-from django.forms import ModelChoiceField
+from service_objects.fields import ModelField
 
 
 from vote_photo.models import *
 
 
 class AddLikeService(Service):
-    user = ModelChoiceField(queryset=User.objects.all())
-    photo = ModelChoiceField(queryset=Photo.objects.all())
+    user = ModelField(User)
+    photo = ModelField(Photo)
 
     def process(self):
         return self.checking_like(self.cleaned_data["photo"], self.cleaned_data["user"])
@@ -18,6 +18,5 @@ class AddLikeService(Service):
             one_like_user.delete()
             return True
         else:
-            photo = photo
             Like.objects.create(user=user, photo=photo)
             return False

@@ -1,5 +1,5 @@
 from service_objects.services import Service
-from django.forms import ModelChoiceField
+from service_objects.fields import ModelField
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
@@ -9,8 +9,8 @@ channel_layer = get_channel_layer()
 
 
 class UpdateStateOnNotVerifiedService(Service):
-    photo = ModelChoiceField(queryset=Photo.objects.all())
-    user = ModelChoiceField(queryset=User.objects.all())
+    photo = ModelField(Photo)
+    user = ModelField(User)
 
     def process(self):
         self.change_state(self.cleaned_data["photo"])
@@ -34,8 +34,8 @@ class UpdateStateOnNotVerifiedService(Service):
 
 
 class UpdateStateOnVerifiedService(Service):
-    photo = ModelChoiceField(queryset=Photo.objects.all())
-    user = ModelChoiceField(queryset=User.objects.all())
+    photo = ModelField(Photo)
+    user = ModelField(User)
 
     def process(self):
         self.change_state(self.cleaned_data["photo"])

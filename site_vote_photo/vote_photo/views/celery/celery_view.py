@@ -31,6 +31,6 @@ def delete_photo(request, photoID):
      так как фотография отправлена на удаление.
     """
     ServiceDeletePhoto.execute(
-        {"photo": get_object_or_404(Photo, id=photoID), "req_user": request.user}
+        {"photo": get_object_or_404(Photo, id=photoID), "user": request.user}
     )
     return redirect("all_photo")
