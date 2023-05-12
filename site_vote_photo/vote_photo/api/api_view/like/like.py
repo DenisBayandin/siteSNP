@@ -15,20 +15,29 @@ from rest_framework.response import Response
 
 from vote_photo.api.serializers.like import LikeSerializers
 from vote_photo.models import *
+from vote_photo.api.serializers.swagger import (
+    AutoSwaggerShcemeGetPhotoIdFromLikeSerializers,
+)
 
 
 class ListPhotoLikeView(ListAPIView):
     serializer_class = LikeSerializers
     lookup_field = "id"
 
-    @swagger_auto_schema(tags=["Like"], operation_description="View all like one photo")
-    def get(self, request, id, format=None):
-        likes = Like.objects.filter(photo=id)
+    @swagger_auto_schema(
+        query_serializer=AutoSwaggerShcemeGetPhotoIdFromLikeSerializers,
+        tags=["Like"],
+        operation_description="View all like one photo",
+    )
+    def get(self, request, format=None):
+        likes = Like.objects.filter(photo=request.GET.get("photo_id"))
         serializers = LikeSerializers(likes, many=True)
         return Response(serializers.data, status=status.HTTP_200_OK)
 
 
-class CreateLikeView(mixins.CreateModelMixin, mixins.DestroyModelMixin, GenericAPIView):
+class CreateDeleteLikeView(
+    mixins.CreateModelMixin, mixins.DestroyModelMixin, GenericAPIView
+):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
     parser_classes = (MultiPartParser,)

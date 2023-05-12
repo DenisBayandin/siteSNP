@@ -33,7 +33,7 @@ class TestPostComment(APITestCase):
         print("Run test_create_comment_is_available_token.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.post(
-            f"/api/comment/photo/{self.photo.id}",
+            f"/api/comments/photo/{self.photo.id}",
             {
                 "content": "Create comment is self.photo",
             },
@@ -43,7 +43,7 @@ class TestPostComment(APITestCase):
     def test_create_comment_is_not_available_token(self):
         print("Run test_create_comment_is_not_available_token.")
         response = self.client.post(
-            f"/api/comment/photo/{self.photo.id}",
+            f"/api/comments/photo/{self.photo.id}",
             {
                 "content": "Create comment is self.photo",
             },
@@ -54,7 +54,7 @@ class TestPostComment(APITestCase):
         print("Run test_create_comment_is_not_valided_data.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.post(
-            f"/api/comment/photo/{self.photo.id}",
+            f"/api/comments/photo/{self.photo.id}",
             {"content": "Create comment is self.photo", "parent": self.comment},
         )
         self.assertEquals(response.status_code, 400)

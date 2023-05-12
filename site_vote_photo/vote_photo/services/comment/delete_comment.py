@@ -10,16 +10,16 @@ class DeleteCommentService(Service):
     user = ModelField(User)
 
     def process(self):
-        self.check_children_comment(
+        if self.repay_true_if_not_children_comment(
             self.cleaned_data["comment"], self.cleaned_data["user"]
-        )
+        ):
+            self.delete_comment(self.cleaned_data["user"], self.cleaned_data["comment"])
 
-    def check_children_comment(self, comment, user):
-        for comment_children in Comment.objects.filter(parent=comment.id):
-            if comment_children.parent.id == comment.id:
-                raise ValidationError("Невозможно удалить данный комментарий.")
-        self.check_delete_comment(user, comment)
+    def repay_true_if_not_children_comment(self, comment, user):
+        if Comment.objects.filter(parent=comment.id).first() is not None:
+            raise ValidationError("Невозможно удалить данный комментарий.")
+        return True
 
-    def check_delete_comment(self, user, comment):
+    def delete_comment(self, user, comment):
         if user == comment.user:
             comment.delete()

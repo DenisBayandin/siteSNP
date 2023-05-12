@@ -37,7 +37,7 @@ class TestChangeStatePhotoAdmin(APITestCase):
     def test_update_photo(self):
         print("Run test_update_photo.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.put(
+        response = self.client.post(
             f"/api/admin/photo/{self.photo.id}/apply_change_photo"
         )
         self.photo = Photo.objects.get(id=self.photo.id)
@@ -49,7 +49,7 @@ class TestChangeStatePhotoAdmin(APITestCase):
         self.photo.go_state_not_verified()
         self.photo.save()
         self.photo = Photo.objects.get(id=self.photo.id)
-        response = self.client.put(
+        response = self.client.post(
             f"/api/admin/photo/{self.photo.id}/apply_change_photo"
         )
         self.assertEquals(response.status_code, 400)
@@ -57,7 +57,7 @@ class TestChangeStatePhotoAdmin(APITestCase):
     def test_update_photo_error_404(self):
         print("Run test_update_photo_error_404.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.put(f"/api/admin/photo/500/apply_change_photo")
+        response = self.client.post(f"/api/admin/photo/500/apply_change_photo")
         self.photo = Photo.objects.get(id=self.photo.id)
         self.assertEquals(response.status_code, 404)
 
@@ -79,7 +79,7 @@ class TestChangeStatePhotoAdmin(APITestCase):
 
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
 
-        response = self.client.put(
+        response = self.client.post(
             f"/api/admin/photo/{self.photo.id}/apply_change_photo"
         )
         self.photo = Photo.objects.get(id=self.photo.id)

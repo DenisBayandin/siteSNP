@@ -23,7 +23,7 @@ class TestPutPatchUser(APITestCase):
         print("Run test_put_is_available_token_and_valided_password.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         request = self.client.put(
-            f"/api/users/{self.user.id}/",
+            f"/api/users/{self.user.id}",
             {
                 "password": "Qaz789123",
                 "new_password": "Zxc230104",
@@ -37,7 +37,7 @@ class TestPutPatchUser(APITestCase):
         print("Run test_put_is_available_token_and_valided_data.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         request = self.client.put(
-            f"/api/users/{self.user.id}/",
+            f"/api/users/{self.user.id}",
             {
                 "username": "12",
                 "first_name": "34",
@@ -53,7 +53,7 @@ class TestPutPatchUser(APITestCase):
         print("Run test_is_available_token_not_found_user.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         request = self.client.put(
-            "/api/users/151/",
+            "/api/users/151",
             {
                 "username": "12",
                 "first_name": "34",
@@ -68,7 +68,7 @@ class TestPutPatchUser(APITestCase):
     def test_put_is_not_available_token_and_valided_data(self):
         print("Run test_put_is_not_available_token_and_valided_data.")
         request = self.client.put(
-            f"/api/users/{self.user.id}/",
+            f"/api/users/{self.user.id}",
             {
                 "username": "12",
                 "first_name": "34",
@@ -86,7 +86,7 @@ class TestPutPatchUser(APITestCase):
         token = Token.objects.create(user_id=user)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
         request = self.client.put(
-            f"/api/users/{self.user.id}/",
+            f"/api/users/{self.user.id}",
             {
                 "username": "12",
                 "first_name": "34",
@@ -102,7 +102,7 @@ class TestPutPatchUser(APITestCase):
         print("Run test_put_not_valided_password.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         request = self.client.put(
-            f"/api/users/{self.user.id}/",
+            f"/api/users/{self.user.id}",
             {
                 "password": "Qaz",
                 "new_password": "Zxc230104",
@@ -116,7 +116,7 @@ class TestPutPatchUser(APITestCase):
         print("Run test_put_not_valided_new_password.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         request = self.client.put(
-            f"/api/users/{self.user.id}/",
+            f"/api/users/{self.user.id}",
             {
                 "password": "Qaz789123",
                 "new_password": "Zxc230104",

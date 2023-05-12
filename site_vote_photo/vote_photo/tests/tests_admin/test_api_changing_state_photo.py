@@ -30,8 +30,8 @@ class TestChangeStatePhotoAdmin(APITestCase):
     def test_change_state_photo(self):
         print("Run test_change_state_photo.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.put(
-            f"/api/admin/photo/{self.photo.id}/changing_state/on_check/"
+        response = self.client.post(
+            f"/api/admin/photo/{self.photo.id}/changing_state/on_check"
         )
         self.photo = Photo.objects.get(id=self.photo.id)
         self.assertEquals(response.status_code, 200)
@@ -53,30 +53,30 @@ class TestChangeStatePhotoAdmin(APITestCase):
         token = Token.objects.create(user_id=user.id)
 
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
-        response = self.client.put(
-            f"/api/admin/photo/{self.photo.id}/changing_state/on_check/"
+        response = self.client.post(
+            f"/api/admin/photo/{self.photo.id}/changing_state/on_check"
         )
         self.assertEquals(response.status_code, 403)
 
     def test_change_state_photo_not_valided_state(self):
         print("Run test_change_state_photo_not_valided_state.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.put(
-            f"/api/admin/photo/{self.photo.id}/changing_state/asddsaasd/"
+        response = self.client.post(
+            f"/api/admin/photo/{self.photo.id}/changing_state/asddsaasd"
         )
         self.assertEquals(response.status_code, 404)
 
     def test_change_state_photo_the_same_condition(self):
         print("Run test_change_state_photo_the_same_condition.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.put(
-            f"/api/admin/photo/{self.photo.id}/changing_state/not_verified/"
+        response = self.client.post(
+            f"/api/admin/photo/{self.photo.id}/changing_state/not_verified"
         )
         self.assertEquals(response.status_code, 400)
 
     def test_change_state_photo_error_404(self):
         print("Run test_change_state_photo_error_404.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.put(f"/api/admin/photo/500/changing_state/on_check/")
+        response = self.client.post(f"/api/admin/photo/500/changing_state/on_check")
         self.photo = Photo.objects.get(id=self.photo.id)
         self.assertEquals(response.status_code, 404)

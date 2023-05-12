@@ -33,17 +33,17 @@ class TestRetrieveComment(APITestCase):
     def test_retrieve_comment_is_available_token(self):
         print("Run test_retrieve_comment_is_available_token.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.get(f"/api/comments/{self.comment.id}/")
+        response = self.client.get(f"/api/comments/{self.comment.id}")
         print(response.data)
         self.assertEquals(response.status_code, 200)
 
     def test_retrieve_comment_is_not_available_token(self):
         print("Run test_retrieve_comment_is_not_available_token.")
-        response = self.client.get(f"/api/comments/{self.comment.id}/")
+        response = self.client.get(f"/api/comments/{self.comment.id}")
         self.assertEquals(response.status_code, 401)
 
     def test_retrieve_comment_is_available_token_not_valided_url(self):
         print("Run test_retrieve_comment_is_available_token_not_valided_url.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.get(f"/api/comments/500/")
+        response = self.client.get(f"/api/comments/500")
         self.assertEquals(response.status_code, 404)

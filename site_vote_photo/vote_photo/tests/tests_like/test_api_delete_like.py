@@ -33,7 +33,7 @@ class TestDeleteLike(APITestCase):
             user=self.user,
             photo=self.photo,
         )
-        response = self.client.delete(f"/api/like/{self.photo.id}/")
+        response = self.client.delete(f"/api/likes/{self.photo.id}")
         self.assertEquals(response.status_code, 204)
 
     def test_delete_like_is_available_token_not_valided_url_not_found_photo(self):
@@ -45,7 +45,7 @@ class TestDeleteLike(APITestCase):
             user=self.user,
             photo=self.photo,
         )
-        response = self.client.delete(f"/api/like/500/")
+        response = self.client.delete(f"/api/likes/500")
         self.assertEquals(response.status_code, 404)
 
     def test_delete_like_valided_data_is_not_available_token(self):
@@ -54,11 +54,11 @@ class TestDeleteLike(APITestCase):
             user=self.user,
             photo=self.photo,
         )
-        response = self.client.delete(f"/api/like/{self.photo.id}/")
+        response = self.client.delete(f"/api/likes/{self.photo.id}")
         self.assertEquals(response.status_code, 401)
 
     def test_delete_like_not_have_like_photo(self):
         print("Run test_delete_like_not_have_like_photo.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.delete(f"/api/like/{self.photo.id}/")
+        response = self.client.delete(f"/api/likes/{self.photo.id}")
         self.assertEquals(response.status_code, 404)

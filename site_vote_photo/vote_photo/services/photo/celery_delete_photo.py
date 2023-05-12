@@ -10,12 +10,12 @@ channel_layer = get_channel_layer()
 
 class ServiceCeleryDeletePhoto(Service):
     def process(self):
-        self.check_the_time_and_delete(Photo.objects.filter(state="Delete"))
+        self.check_the_time_and_delete_photo(Photo.objects.filter(state="Delete"))
         return self.what_to_return_to_the_main_function(
             Photo.objects.filter(state="Delete").count()
         )
 
-    def check_the_time_and_delete(self, queryset_photo):
+    def check_the_time_and_delete_photo(self, queryset_photo):
         for one_photo_delete in queryset_photo:
             if timezone.now() >= one_photo_delete.date_delete:
                 one_photo_delete.delete()

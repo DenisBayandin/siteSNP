@@ -25,10 +25,10 @@ class TestGetToken(APITestCase):
     def test_get_token(self):
         print("Run test_get_token.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.get("/api/token/")
+        response = self.client.get("/api/auth/token")
         self.assertEquals(response.status_code, 200)
 
     def test_get_token_not_auth(self):
         print("Run test_get_token_not_auth.")
-        response = self.client.get("/api/token/")
+        response = self.client.get("/api/auth/token")
         self.assertEquals(response.status_code, 400)

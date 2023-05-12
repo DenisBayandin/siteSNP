@@ -14,7 +14,7 @@ from vote_photo.models import Photo
 from vote_photo.api.serializers.photo import AllPhotoSerializers
 
 
-class AdminChangingStatePhotoView(UpdateAPIView):
+class AdminChangingStatePhotoView(APIView):
     permission_classes = (IsAuthenticated, IsAdminUser)
     authentication_classes = (TokenAuthentication,)
     parser_classes = (MultiPartParser,)
@@ -24,7 +24,10 @@ class AdminChangingStatePhotoView(UpdateAPIView):
     def get_objects(self, id):
         return get_object_or_404(Photo, id=id)
 
-    def process_work(self, request, id, state, *args, **kwargs):
+    @swagger_auto_schema(
+        tags=["Admin"], operation_description="Changing the status of the photo."
+    )
+    def post(self, request, id, state, *args, **kwargs):
         photo = self.get_objects(id)
         try:
             if state == "not_verified":
@@ -63,27 +66,21 @@ class AdminChangingStatePhotoView(UpdateAPIView):
         serializers = AllPhotoSerializers(photo)
         return Response(serializers.data, status=status.HTTP_200_OK)
 
-    @swagger_auto_schema(
-        tags=["Admin"], operation_description="Changing the status of the photo."
-    )
-    def put(self, request, id, state, *args, **kwargs):
-        return self.process_work(request, id, state)
 
-    @swagger_auto_schema(
-        tags=["Admin"], operation_description="Changing the status of the photo."
-    )
-    def patch(self, request, id, state, *args, **kwargs):
-        return self.process_work(request, id, state)
-
-
-class AdminUpdatePhotoView(UpdateAPIView):
+class AdminUpdatePhotoView(APIView):
     permission_classes = (IsAuthenticated, IsAdminUser)
     authentication_classes = (TokenAuthentication,)
     parser_classes = (MultiPartParser,)
     queryset = Photo.objects.all()
     lookup_field = "id"
 
-    def update_photo(self, request, id, *args, **kwargs):
+    @swagger_auto_schema(
+        tags=["Admin"],
+        operation_description="Approval of the photo modification."
+        " We change the old photo to a new one and delete the photos,"
+        " or change the photo data.",
+    )
+    def post(self, request, id, *args, **kwargs):
         photo = get_object_or_404(Photo, id=id)
         if photo.state == "Update":
             photo.old_photo = photo.new_photo
@@ -102,21 +99,3 @@ class AdminUpdatePhotoView(UpdateAPIView):
             },
             status=status.HTTP_400_BAD_REQUEST,
         )
-
-    @swagger_auto_schema(
-        tags=["Admin"],
-        operation_description="Approval of the photo modification."
-        " We change the old photo to a new one and delete the photos,"
-        " or change the photo data.",
-    )
-    def put(self, request, id, *args, **kwargs):
-        return self.update_photo(request, id)
-
-    @swagger_auto_schema(
-        tags=["Admin"],
-        operation_description="Approval of the photo modification."
-        " We change the old photo to a new one and delete the photos,"
-        " or change the photo data.",
-    )
-    def patch(self, request, id, *args, **kwargs):
-        return self.update_photo(request, id)

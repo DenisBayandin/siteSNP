@@ -28,10 +28,10 @@ class TestGetRetrievePhoto(APITestCase):
 
     def test_get_retrieve_photo(self):
         print("Run test_get_retrieve_photo.")
-        response = self.client.get(f"/api/photos/{self.photo.id}/")
+        response = self.client.get(f"/api/photos/{self.photo.id}")
         self.assertEquals(response.status_code, 200)
 
     def test_get_retrieve_photo_is_not_valided_url(self):
         print("Run test_get_retrieve_photo_is_not_valided_url.")
-        response = self.client.get(f"/api/photos/500/")
+        response = self.client.get(f"/api/photos/500")
         self.assertEquals(response.status_code, 404)

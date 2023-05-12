@@ -37,10 +37,10 @@ class TestGetListComment(APITestCase):
 
     def test_get_list_comment_is_valided_url(self):
         print("Run test_get_list_comment_is_valided_url.")
-        response = self.client.get(f"/api/comments/photo/{self.photo.id}")
+        response = self.client.get(f"/api/comments/photo?photo_id={self.photo.id}")
         self.assertEquals(response.status_code, 200)
 
     def test_get_list_comment_is_not_valided_url(self):
         print("Run test_get_list_comment_is_not_valided_url.")
-        response = self.client.get("/api/comments/photo/500")
+        response = self.client.get("/api/comments/photo?photo_id=500")
         self.assertEquals(response.status_code, 404)

@@ -16,9 +16,9 @@ class ServiceDeletePhoto(Service):
 
     def process(self):
         self.change_data_photo_and_state_photo(self.cleaned_data["photo"])
-        self.check_and_send_notification()
+        self.check_to_whom_send_notification_and_send_notification()
 
-    def check_and_send_notification(self):
+    def check_to_whom_send_notification_and_send_notification(self):
         check_send_notification = []
         for comment in Comment.objects.filter(photo_id=self.cleaned_data["photo"].id):
             get_user = User.objects.get(id=comment.user_id)

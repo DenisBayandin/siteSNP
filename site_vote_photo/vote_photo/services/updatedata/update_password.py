@@ -15,12 +15,15 @@ class ServiceUpdatePassword(Service):
     user = ModelField(User)
 
     def process(self):
-        self.check_password(
+        if self.check_password(
             self.cleaned_data["password"],
             self.cleaned_data["new_password"],
             self.cleaned_data["new_password2"],
             self.cleaned_data["user"],
-        )
+        ):
+            self.changing_the_password(
+                self.cleaned_data["user"], self.cleaned_data["new_password"]
+            )
         self.cleaned_data["user"].save()
 
     def check_password(self, password, new_password, new_password2, user):
@@ -29,7 +32,7 @@ class ServiceUpdatePassword(Service):
                 if new_password != new_password2:
                     raise ValueError("Новые пароли не сходятся.")
                 else:
-                    self.changing_the_password(user, new_password)
+                    return True
             else:
                 raise ValidationError("Ввели не верный основной пароль.")
 

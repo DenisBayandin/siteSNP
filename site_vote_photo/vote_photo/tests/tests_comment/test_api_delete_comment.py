@@ -37,12 +37,12 @@ class TestDeleteComment(APITestCase):
     def test_delete_comment_is_available_token(self):
         print("Run test_delete_comment_is_available_token.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.delete(f"/api/comments/{self.comment.id}/")
+        response = self.client.delete(f"/api/comments/{self.comment.id}")
         self.assertEquals(response.status_code, 204)
 
     def test_delete_comment_is_not_available_token(self):
         print("Run test_delete_comment_is_not_available_token.")
-        response = self.client.delete(f"/api/comments/{self.comment.id}/")
+        response = self.client.delete(f"/api/comments/{self.comment.id}")
         self.assertEquals(response.status_code, 401)
 
     def test_delete_another_user_delete_comment(self):
@@ -61,7 +61,7 @@ class TestDeleteComment(APITestCase):
         user.save()
         token = Token.objects.create(user_id=user.id)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
-        response = self.client.delete(f"/api/comments/{self.comment.id}/")
+        response = self.client.delete(f"/api/comments/{self.comment.id}")
         self.comment.refresh_from_db()
         self.assertEquals(response.status_code, 400)
 
@@ -71,11 +71,11 @@ class TestDeleteComment(APITestCase):
         self.two_comment.parent = self.comment
         self.two_comment.save()
         self.two_comment.refresh_from_db()
-        response = self.client.delete(f"/api/comments/{self.comment.id}/")
+        response = self.client.delete(f"/api/comments/{self.comment.id}")
         self.assertEquals(response.status_code, 400)
 
     def test_delete_comment_is_not_valided_url(self):
         print("Run test_delete_comment_is_not_valided_url.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.delete(f"/api/comments/500/")
+        response = self.client.delete(f"/api/comments/500")
         self.assertEquals(response.status_code, 404)

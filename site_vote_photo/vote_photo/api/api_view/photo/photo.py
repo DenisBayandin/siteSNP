@@ -15,6 +15,7 @@ from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 
+from ...serializers.swagger import AutoSwaggerShcemeFilterPhotoSerializers
 from vote_photo.services.photo.save_photo_with_new_size import NewSizePhotoService
 from vote_photo.models import Photo
 from vote_photo.api.serializers.photo import (
@@ -176,28 +177,34 @@ class RetrieveUpdateDestroyPhotoView(RetrieveUpdateDestroyAPIView):
 class ListPhotoFilterView(ListAPIView):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (TokenAuthentication,)
+    parser_classes = (MultiPartParser,)
     queryset = Photo.objects.all()
     lookup_field = "id"
 
     @swagger_auto_schema(
-        tags=["Photo"], operation_description="Filtering photos by status."
+        query_serializer=AutoSwaggerShcemeFilterPhotoSerializers,
+        tags=["Photo"],
+        operation_description="Filtering photos by status.",
     )
-    def get(self, request, filter, format=None):
+    def get(self, request, format=None):
+        filter_state = request.GET.get("filter_photo")
         filters = {
-            "verified": "Verified",
-            "not_verified": "Not verified",
-            "update": "Update",
-            "delete": "Delete",
-            "on_check": "On check",
+            "Verified": "Verified",
+            "Not verified": "Not verified",
+            "Update": "Update",
+            "Delete": "Delete",
+            "On check": "On check",
         }
         try:
-            photos = Photo.objects.filter(state=filters[filter], user=request.user)
+            photos = Photo.objects.filter(
+                state=filters[filter_state], user=request.user
+            )
         except KeyError:
             return Response(
                 {
                     "error": "Введите другой фильтр, доступные фильтры: "
-                    "1) verified 2) not_verified 3) update "
-                    "4) delete 5) on_check. Пример запроса: .../api/user/photos/verified/",
+                    "1) Verified 2) Not verified 3) Update "
+                    "4) Delete 5) On check",
                     "status": status.HTTP_404_NOT_FOUND,
                 },
                 status=status.HTTP_404_NOT_FOUND,

@@ -39,7 +39,7 @@ class TestPutPatchComment(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
 
         response = self.client.put(
-            f"/api/comments/{self.comment.id}/",
+            f"/api/comments/{self.comment.id}",
             {"content": "Denis update this comment.", "parent": self.two_comment.id},
         )
         self.comment.refresh_from_db()
@@ -49,7 +49,7 @@ class TestPutPatchComment(APITestCase):
         print("Run test_put_is_available_token_and_not_valided_data.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.put(
-            f"/api/comments/{self.comment.id}/",
+            f"/api/comments/{self.comment.id}",
             {"content": "Denis update this comment.", "parent": self.two_comment},
         )
         self.comment.refresh_from_db()
@@ -58,7 +58,7 @@ class TestPutPatchComment(APITestCase):
     def test_put_is_not_available_token_and_valided_data(self):
         print("Run test_put_is_not_available_token_and_valided_data/")
         response = self.client.put(
-            f"/api/comments/{self.comment.id}/",
+            f"/api/comments/{self.comment.id}",
             {"content": "Denis update this comment.", "parent": self.two_comment.id},
         )
         self.comment.refresh_from_db()
@@ -83,7 +83,7 @@ class TestPutPatchComment(APITestCase):
         token = Token.objects.create(user_id=user.id)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
         response = self.client.put(
-            f"/api/comments/{self.comment.id}/",
+            f"/api/comments/{self.comment.id}",
             {"content": "Denis update this comment.", "parent": self.two_comment.id},
         )
         self.comment.refresh_from_db()

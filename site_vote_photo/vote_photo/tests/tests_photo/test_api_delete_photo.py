@@ -29,12 +29,12 @@ class TestDeletePhoto(APITestCase):
     def test_delete_photo_is_available_token(self):
         print("Run test_delete_photo_is_available_token.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.delete(f"/api/photos/{self.photo.id}/")
+        response = self.client.delete(f"/api/photos/{self.photo.id}")
         self.assertEquals(response.status_code, 204)
 
     def test_delete_photo_is_not_available_token(self):
         print("Run test_delete_photo_is_not_available_token.")
-        response = self.client.delete(f"/api/photos/{self.photo.id}/")
+        response = self.client.delete(f"/api/photos/{self.photo.id}")
         self.assertEquals(response.status_code, 401)
 
     def test_delete_photo_is_available_token_delete_another_user(self):
@@ -53,11 +53,11 @@ class TestDeletePhoto(APITestCase):
         user.save()
         token = Token.objects.create(user_id=user.id)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
-        response = self.client.delete(f"/api/photos/{self.photo.id}/")
+        response = self.client.delete(f"/api/photos/{self.photo.id}")
         self.assertEquals(response.status_code, 400)
 
     def test_delete_photo_is_available_token_is_error_404(self):
         print("Run test_delete_photo_is_available_token_is_error_404.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.delete(f"/api/photos/500/")
+        response = self.client.delete(f"/api/photos/500")
         self.assertEquals(response.status_code, 404)

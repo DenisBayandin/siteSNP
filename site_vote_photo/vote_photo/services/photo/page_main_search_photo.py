@@ -16,15 +16,20 @@ class ServiceMainSearchPhoto(Service):
             ),
             state="Verified",
         )
-        return self.queryset_count(queryset_photo, self.cleaned_data["search"])
+        if self.queryset_count(queryset_photo, self.cleaned_data["search"]):
+            return self.repay_photos_by_the_users_name(self.cleaned_data["search"])
+        else:
+            return self.repay_photos_by_the_users_name_a_also_name_and_content_photo(
+                queryset_photo, self.cleaned_data["search"]
+            )
 
     def queryset_count(self, queryset, search):
         if queryset.count == 0:
-            return self.if_count_queryset_like_0(search)
+            return True
         elif User.objects.filter(username__icontains=search) != 0:
-            return self.if_count_queryset_not_like_0(queryset, search)
+            return False
 
-    def if_count_queryset_like_0(self, search):
+    def repay_photos_by_the_users_name(self, search):
         photo_search = []
         user_search = User.objects.filter(username__icontains=search)
         if user_search != 0:
@@ -38,7 +43,9 @@ class ServiceMainSearchPhoto(Service):
         else:
             return None
 
-    def if_count_queryset_not_like_0(self, queryset, search):
+    def repay_photos_by_the_users_name_a_also_name_and_content_photo(
+        self, queryset, search
+    ):
         photo_search_to_user = []
         user_search = User.objects.filter(username__icontains=search)
         for user_in_search in user_search:

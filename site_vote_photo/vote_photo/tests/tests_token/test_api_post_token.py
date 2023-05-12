@@ -26,7 +26,7 @@ class TestRefreshToken(APITestCase):
         print("Run test_refresh_token_is_available_token.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.post(
-            "/api/token/", {"username": "Den4ikys", "password": "Qaz789123"}
+            "/api/auth/", {"username": "Den4ikys", "password": "Qaz789123"}
         )
         print(response.data)
         self.assertEquals(response.status_code, 200)
@@ -34,7 +34,7 @@ class TestRefreshToken(APITestCase):
     def test_refresh_token_is_not_available_token(self):
         print("Run test_refresh_token_is_not_available_token.")
         response = self.client.post(
-            "/api/token/", {"username": "Den4ikys", "password": "Qaz789123"}
+            "/api/auth/", {"username": "Den4ikys", "password": "Qaz789123"}
         )
         self.assertEquals(response.status_code, 401)
 
@@ -42,7 +42,7 @@ class TestRefreshToken(APITestCase):
         print("Run test_refresh_token_is_available_token_and_not_valided_username.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.post(
-            "/api/token/", {"username": "Den", "password": "Qaz789123"}
+            "/api/auth/", {"username": "Den", "password": "Qaz789123"}
         )
         self.assertEquals(response.status_code, 404)
 
@@ -50,7 +50,7 @@ class TestRefreshToken(APITestCase):
         print("Run test_refresh_token_is_available_token_and_not_valided_password.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.post(
-            "/api/token/", {"username": "Den4ikys", "password": "Qaz"}
+            "/api/auth/", {"username": "Den4ikys", "password": "Qaz"}
         )
         self.assertEquals(response.status_code, 400)
 
@@ -72,6 +72,6 @@ class TestRefreshToken(APITestCase):
 
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
         response = self.client.post(
-            "/api/token/", {"username": "Den4ikys", "password": "Qaz789123"}
+            "/api/auth/", {"username": "Den4ikys", "password": "Qaz789123"}
         )
         self.assertEquals(response.status_code, 400)

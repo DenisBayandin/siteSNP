@@ -29,18 +29,18 @@ class TestPostLike(APITestCase):
     def test_post_like_is_available_token(self):
         print("Run test_post_like_is_available_token.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.post(f"/api/like/{self.photo.id}/")
+        response = self.client.post(f"/api/likes/{self.photo.id}")
         self.assertEquals(response.status_code, 200)
 
     def test_post_like_is_not_available_token(self):
         print("Run test_post_like_is_not_available_token.")
-        response = self.client.post(f"/api/like/{self.photo.id}/")
+        response = self.client.post(f"/api/likes/{self.photo.id}")
         self.assertEquals(response.status_code, 401)
 
     def test_post_like_is_available_token_not_valided_url(self):
         print("Run test_post_like_is_available_token_not_valided_url.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.post(f"/api/like/500/")
+        response = self.client.post(f"/api/likes/500")
         self.assertEquals(response.status_code, 404)
 
     def test_post_like_is_two_like_one_photo_one_user(self):
@@ -50,5 +50,5 @@ class TestPostLike(APITestCase):
             photo=self.photo,
         )
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.post(f"/api/like/{self.photo.id}/")
+        response = self.client.post(f"/api/likes/{self.photo.id}")
         self.assertEquals(response.status_code, 400)

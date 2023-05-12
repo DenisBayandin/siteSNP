@@ -29,17 +29,17 @@ class TestFilterPhoto(APITestCase):
     def test_get_photo_with_filter(self):
         print("Run test_get_photo_with_filter.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.get("/api/photos/not_verified/")
+        response = self.client.get("/api/photos/user?filter_photo=Not%20verified")
         self.assertEquals(response.status_code, 200)
 
     def test_get_photo_with_filter_invalid_filter(self):
         print("Run test_get_photo_with_filter_invalid_filter.")
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
-        response = self.client.get("/api/photos/afdsfs/")
+        response = self.client.get("/api/photos/user?filter_photo=afdsfs")
         print(f"\nresponse data with invalid filter = {response.data}")
         self.assertEquals(response.status_code, 404)
 
     def test_get_photo_with_filter_is_not_available_token(self):
         print("Run test_get_photo_with_filter_is_not_available_token.")
-        response = self.client.get("/api/photos/not_verified/")
+        response = self.client.get("/api/photos/user?filter_photo=Not%20verified")
         self.assertEquals(response.status_code, 401)

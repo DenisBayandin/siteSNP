@@ -46,5 +46,5 @@ class TestGetListLike(APITestCase):
             user=user,
             photo=self.photo,
         )
-        response = self.client.get(f"/api/likes/{self.photo.id}/")
+        response = self.client.get(f"/api/likes/?photo_id={self.photo.id}")
         self.assertEquals(response.status_code, 200)

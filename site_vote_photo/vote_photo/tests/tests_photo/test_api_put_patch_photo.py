@@ -37,7 +37,7 @@ class TestPutPatchPhoto(APITestCase):
         file = self.open_to_update_photo()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.put(
-            f"/api/photos/{self.photo.id}/",
+            f"/api/photos/{self.photo.id}",
             {
                 "name": "Update photo",
                 "content": "Updateeee...",
@@ -50,7 +50,7 @@ class TestPutPatchPhoto(APITestCase):
         print("Run test_put_photo_is_not_available_token.")
         file = self.open_to_update_photo()
         response = self.client.put(
-            f"/api/photos/{self.photo.id}/",
+            f"/api/photos/{self.photo.id}",
             {
                 "name": "Update photo",
                 "content": "Updateeee...",
@@ -75,7 +75,7 @@ class TestPutPatchPhoto(APITestCase):
         token = Token.objects.create(user_id=user.id)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
         response = self.client.put(
-            f"/api/photos/{self.photo.id}/",
+            f"/api/photos/{self.photo.id}",
             {
                 "name": "Update photo",
                 "content": "Updateeee...",
@@ -89,7 +89,7 @@ class TestPutPatchPhoto(APITestCase):
         file = self.open_to_update_photo()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
         response = self.client.put(
-            f"/api/photos/500/",
+            f"/api/photos/500",
             {
                 "name": "Update photo",
                 "content": "Updateeee...",

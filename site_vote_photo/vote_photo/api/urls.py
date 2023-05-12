@@ -14,7 +14,7 @@ from vote_photo.api.api_view.comment.comment import (
     RetrieveUpdateDestroyCommentView,
     CreateCommentView,
 )
-from vote_photo.api.api_view.like.like import ListPhotoLikeView, CreateLikeView
+from vote_photo.api.api_view.like.like import ListPhotoLikeView, CreateDeleteLikeView
 from vote_photo.api.api_view.user.user import ListCreateUserView, UpdateUserView
 from vote_photo.api.api_view.admin.admin import (
     AdminChangingStatePhotoView,
@@ -23,6 +23,7 @@ from vote_photo.api.api_view.admin.admin import (
 from vote_photo.api.api_view.token.custom_auth_token import (
     RetrieveCreateCustomAuthTokenView,
 )
+from vote_photo.api.api_view.token.custom_refresh_token import RefreshTokenView
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -37,18 +38,19 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("photos/", ListCreatePhotoView.as_view()),
-    path("photos/<int:id>/", RetrieveUpdateDestroyPhotoView.as_view()),
-    path("photos/<str:filter>/", ListPhotoFilterView.as_view()),
+    path("photos/<int:id>", RetrieveUpdateDestroyPhotoView.as_view()),
+    path("photos/user", ListPhotoFilterView.as_view()),
     path("users/", ListCreateUserView.as_view()),
-    path("users/<int:id>/", UpdateUserView.as_view()),
-    path("token/", RetrieveCreateCustomAuthTokenView.as_view()),
-    path("comments/<int:id>/", RetrieveUpdateDestroyCommentView.as_view()),
-    path("comments/photo/<int:id>", ListCommentView.as_view()),
-    path("comment/photo/<int:id>", CreateCommentView.as_view()),
-    path("likes/<int:id>/", ListPhotoLikeView.as_view()),
-    path("like/<int:id>/", CreateLikeView.as_view()),
+    path("users/<int:id>", UpdateUserView.as_view()),
+    path("auth/token", RetrieveCreateCustomAuthTokenView.as_view()),
+    path("auth/", RefreshTokenView.as_view()),
+    path("comments/<int:id>", RetrieveUpdateDestroyCommentView.as_view()),
+    path("comments/photo", ListCommentView.as_view()),
+    path("comments/photo/<int:id>", CreateCommentView.as_view()),
+    path("likes/", ListPhotoLikeView.as_view()),
+    path("likes/<int:id>", CreateDeleteLikeView.as_view()),
     path(
-        "admin/photo/<int:id>/changing_state/<str:state>/",
+        "admin/photo/<int:id>/changing_state/<str:state>",
         AdminChangingStatePhotoView.as_view(),
     ),
     path("admin/photo/<int:id>/apply_change_photo", AdminUpdatePhotoView.as_view()),

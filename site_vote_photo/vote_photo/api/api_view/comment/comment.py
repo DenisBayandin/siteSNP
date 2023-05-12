@@ -19,6 +19,9 @@ from vote_photo.api.serializers.comment import (
     AutoSwaggerShcemeCommentSerializers,
 )
 from vote_photo.models import Comment, Photo
+from vote_photo.api.serializers.swagger import (
+    AutoSwaggerShcemeGetPhotoIdFromCommentSerializers,
+)
 
 
 class RetrieveUpdateDestroyCommentView(RetrieveUpdateDestroyAPIView):
@@ -120,11 +123,13 @@ class ListCommentView(ListAPIView):
     lookup_field = "id"
 
     @swagger_auto_schema(
-        tags=["Comment"], operation_description="View all comments to one photo."
+        query_serializer=AutoSwaggerShcemeGetPhotoIdFromCommentSerializers,
+        tags=["Comment"],
+        operation_description="View all comments to one photo.",
     )
-    def get(self, request, id, *args, **kwargs):
-        get_object_or_404(Photo, id=id)
-        comment = Comment.objects.filter(photo=id)
+    def get(self, request, *args, **kwargs):
+        get_object_or_404(Photo, id=request.GET.get("photo_id"))
+        comment = Comment.objects.filter(photo=request.GET.get("photo_id"))
         serializer = CommentSerializers(comment, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
