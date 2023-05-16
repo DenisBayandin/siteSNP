@@ -6,11 +6,11 @@ from vote_photo.models import *
 
 
 class ServiceRenameProfile(Service):
-    username = forms.CharField()
-    first_name = forms.CharField()
-    last_name = forms.CharField()
-    patronymic = forms.CharField()
-    email = forms.EmailField()
+    username = forms.CharField(max_length=50)
+    first_name = forms.CharField(max_length=50)
+    last_name = forms.CharField(max_length=50)
+    patronymic = forms.CharField(max_length=50)
+    email = forms.EmailField(max_length=100)
     user = ModelField(User)
 
     def process(self):
