@@ -10,7 +10,7 @@ class ServiceRenameProfile(Service):
     first_name = forms.CharField()
     last_name = forms.CharField()
     patronymic = forms.CharField()
-    email = forms.CharField()
+    email = forms.EmailField()
     user = ModelField(User)
 
     def process(self):

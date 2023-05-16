@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.authtoken.models import Token
 
 from vote_photo.models import User
-from vote_photo.services.updatedata.update_token import ServiceRenameToken
+from vote_photo.services.updatedata.update_token import UpdateTokenService
 from vote_photo.services.updatedata.update_profile import ServiceRenameProfile
 
 
@@ -16,7 +16,7 @@ def update_token(request):
     После чего удаляем его и создаём новый, передавая текущего юзера
     И отправляем статус, токен в асинхронный запрос.
     """
-    token = ServiceRenameToken.execute(
+    token = UpdateTokenService.execute(
         {"token": get_object_or_404(Token, user=request.user.id), "user": request.user}
     )
     data = {"status": 200, "token": str(token)}
