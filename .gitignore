@@ -5,11 +5,11 @@ media/
 assert/
 static/
 *.env
-*.mypy_cache
 db.sqlite3
 
 # cache
-__pycache__/
+site_vote_photo/**/__pycache__/
 .cache
 .mypy_cache/
 .pytest_cache/
+.cpython-311.pyc
