@@ -7,6 +7,7 @@ from django.shortcuts import redirect, render
 from django.views.generic import CreateView
 from rest_framework.authtoken.models import Token
 from rest_framework import status
+from ...utils.services.custom_service import ServiceOutcome
 
 from ...myexception.not_valided_password import UpdatePasswordExciption
 from vote_photo.forms import (
@@ -106,14 +107,24 @@ def update_password(request):
         form = UpdatePasswordForm(request.POST)
         if form.is_valid():
             try:
-                ServiceUpdatePassword.execute(
+                outcome = ServiceOutcome(
+                    ServiceUpdatePassword,
                     {
                         "password": request.POST["password"],
                         "new_password": request.POST["new_password"],
                         "new_password2": request.POST["new_password2"],
                         "user": request.user,
-                    }
+                    },
+                    request,
                 )
+                # ServiceUpdatePassword.execute(
+                #     {
+                #         "password": request.POST["password"],
+                #         "new_password": request.POST["new_password"],
+                #         "new_password2": request.POST["new_password2"],
+                #         "user": request.user,
+                #     }
+                # )
             except ValueError:
                 return HttpResponse(
                     "Новые пароли не сходятся.",

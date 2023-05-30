@@ -1,25 +1,33 @@
 from service_objects.services import Service
 from service_objects.fields import ModelField
 from django.core.exceptions import ValidationError
+from ...utils.services.custom_service import ServiceWithResult
+from rest_framework import status
 
 from vote_photo.models import *
 
 
-class DeleteCommentService(Service):
+class DeleteCommentService(ServiceWithResult):
     comment = ModelField(Comment)
     user = ModelField(User)
 
-    def process(self):
-        if self.cleaned_data["user"] == self.cleaned_data["comment"]:
-            if self.repay_true_if_not_children_comment(
-                self.cleaned_data["comment"], self.cleaned_data["user"]
-            ):
-                self.delete_comment(self.cleaned_data["comment"])
+    custom_validations = ["repay_true_if_not_children_comment"]
 
-    def repay_true_if_not_children_comment(self, comment, user):
-        if Comment.objects.filter(parent=comment.id).first() is not None:
-            raise ValidationError("Невозможно удалить данный комментарий.")
-        return True
+    def process(self):
+        self.run_custom_validations()
+        if self.cleaned_data["user"].id == self.cleaned_data["comment"].user.id:
+            if self.is_valid():
+                self.delete_comment(self.cleaned_data["comment"])
+        return self
 
     def delete_comment(self, comment):
         comment.delete()
+
+    def repay_true_if_not_children_comment(self):
+        if (
+            Comment.objects.filter(parent=self.cleaned_data["comment"].id).first()
+            is not None
+        ):
+            self.add_error("id", "It is not possible to delete this comment.")
+            self.response_status = status.HTTP_400_BAD_REQUEST
+            raise ValidationError("Невозможно удалить комментарий.")

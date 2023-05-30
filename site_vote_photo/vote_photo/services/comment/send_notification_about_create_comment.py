@@ -17,7 +17,7 @@ class SendNotificationCommentService(Service):
         self.send_notification(self.cleaned_data["photo"], self.cleaned_data["user"])
 
     def send_notification(self, photo, user):
-        get_user_create_photo = User.objects.get(id=photo.user_id)
+        get_user_create_photo = User.objects.get(id=photo.user.id)
         if user == get_user_create_photo:
             return 0
         notification = Notification.objects.create(

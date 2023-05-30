@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView
+from ...utils.services.custom_service import ServiceOutcome
 
 from vote_photo.services.admin.admin_send_notification_all_user import *
-from vote_photo.services.admin.checking_the_role import checking_the_role_user
+from vote_photo.services.admin.checking_the_role import CheckRoleUserService
 from vote_photo.services.admin.admin_show_one_photo_on_check import (
     ShowPhotoAdminService,
 )
@@ -40,7 +41,9 @@ class ViewPhotoNotVerified(ListView):
         return context
 
     def get_queryset(self):
-        checking_the_role_user(self.request.user)
+        outcome = ServiceOutcome(
+            CheckRoleUserService, {"user": self.request.user}, self.request
+        )
         set_gueryset = set(Photo.objects.filter(state="Not verified"))
         set_photo_search_to_user = set(Photo.objects.filter(state="On check"))
         self.queryset = list(set_gueryset.union(set_photo_search_to_user))
@@ -58,7 +61,9 @@ class ViewPhotoUpdate(ListView):
         return context
 
     def get_queryset(self):
-        checking_the_role_user(self.request.user)
+        outcome = ServiceOutcome(
+            CheckRoleUserService, {"user": self.request.user}, self.request
+        )
         self.queryset = Photo.objects.filter(state="Update")
         return super().get_queryset()
 
@@ -74,7 +79,9 @@ class ViewPhotoDelete(ListView):
         return context
 
     def get_queryset(self):
-        checking_the_role_user(self.request.user)
+        outcome = ServiceOutcome(
+            CheckRoleUserService, {"user": self.request.user}, self.request
+        )
         self.queryset = Photo.objects.filter(state="Delete")
         return super().get_queryset()
 
@@ -86,7 +93,7 @@ def show_photo_admin(request, photoID):
      то провряем на наличие у фотографии state='On check'
     и отображаем фотографию
     """
-    checking_the_role_user(request.user)
+    outcome = ServiceOutcome(CheckRoleUserService, {"user": request.user}, request)
     photo = ShowPhotoAdminService.execute(
         {"photo": get_object_or_404(Photo, id=photoID)}
     )
@@ -104,7 +111,7 @@ def show_photo_admin_update(request, photoID):
      то показыаем ему фотографию.
     Иначе ошибка (Http404).
     """
-    checking_the_role_user(request.user)
+    outcome = ServiceOutcome(CheckRoleUserService, {"user": request.user}, request)
     photo = get_object_or_404(Photo, id=photoID)
     return render(
         request,
@@ -160,12 +167,20 @@ def update_photo(request, photoID):
     return redirect("photo_update")
 
 
-def send_notification_all_user(request):
+def send_notification_all_user(request, **kwargs):
     if request.method == "POST":
-        ServiceSendNotificationAllUser.execute(
+        # ServiceSendNotificationAllUser.execute(
+        #     {
+        #         "message_notification": request.POST["send_notification_all_user"],
+        #         "user": request.user,
+        #     }
+        # )
+        outcome = ServiceOutcome(
+            ServiceSendNotificationAllUser,
             {
                 "message_notification": request.POST["send_notification_all_user"],
                 "user": request.user,
-            }
+            },
+            request,
         )
     return redirect("/admin/")

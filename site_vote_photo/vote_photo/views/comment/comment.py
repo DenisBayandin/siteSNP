@@ -1,5 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
+from ...utils.errors.custom_error import ServiceObjectLogicError
+from ...utils.services.custom_service import ServiceOutcome
 from django.shortcuts import get_object_or_404, redirect
 
 from vote_photo.services.comment.delete_comment import DeleteCommentService
@@ -17,13 +19,14 @@ def delete_comment(request, commentID, photoID):
      на фотографии.
     """
     try:
-        DeleteCommentService.execute(
-            {"comment": get_object_or_404(Comment, id=commentID), "user": request.user}
+        outcome = ServiceOutcome(
+            DeleteCommentService,
+            {"comment": get_object_or_404(Comment, id=commentID), "user": request.user},
+            request,
         )
     except ValidationError:
         return HttpResponse(
-            "Не возможно удалить данные комментарий, так как имеются ответы.",
-            status=400,
+            "Не возможно удалить данные комментарий, так как имеются ответы."
         )
     return redirect("show_photo", photoID)
 
