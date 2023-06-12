@@ -5,6 +5,7 @@ from channels.layers import get_channel_layer
 from datetime import datetime, timedelta
 
 from vote_photo.models import *
+from ..telegram.send_message import send_message_is_telegram
 
 
 channel_layer = get_channel_layer()
@@ -28,13 +29,14 @@ class ServiceDeletePhoto(Service):
                 if self.cleaned_data["user"] == get_user:
                     continue
                 try:
-                    self.send_notification(
+                    user, message = self.send_notification(
                         self.cleaned_data["photo"],
                         get_user,
                         check_send_notification,
                         self.cleaned_data["user"],
                     )
                     self.cleaned_data["photo"].save()
+                    self.send_message_telegram(user, message)
                 except TypeError:
                     continue
 
@@ -58,6 +60,11 @@ class ServiceDeletePhoto(Service):
                 "message": notification_comment_on_the_photo_delete.message,
             },
         )
+        return user, notification_comment_on_the_photo_delete.message
+
+    def send_message_telegram(self, user, message):
+        if user.status == "Offline":
+            send_message_is_telegram(user, message)
 
     def change_data_photo_and_state_photo(self, photo):
         photo.date_delete = datetime.now() + timedelta(minutes=15)

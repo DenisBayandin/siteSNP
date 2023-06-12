@@ -8,7 +8,7 @@ static/
 db.sqlite3
 
 # cache
-site_vote_photo/**/__pycache__/
+__pycache__
 .cache
 .mypy_cache/
 .pytest_cache/

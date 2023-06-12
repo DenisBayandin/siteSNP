@@ -116,6 +116,8 @@ dj3-cloudinary-storage = "==0.0.6"
 django-cloudinary-storage = "==0.3.0"
 sorl-thumbnail = "==12.9.0"
 django-cors-headers = "==3.14.0"
+django-telegram-login = "==0.2.3"
+
 
 [dev-packages]
 django = "==4.1.7"

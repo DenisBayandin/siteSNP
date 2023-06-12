@@ -31,6 +31,7 @@ from .views import (
     update_password,
     notification_view,
     send_notification_all_user,
+    auth_telegram
 )
 
 
@@ -38,6 +39,7 @@ urlpatterns = [
     path("", MainView.as_view(), name="main"),
     path("login/", LoginUser.as_view(), name="login"),
     path("register/", RegisterUser.as_view(), name="register"),
+    path("register/telegram/", auth_telegram, name="register_telegram"),
     path("accounts/profile/", profile, name="profile"),
     path("logout/", logout_view, name="logout"),
     path("show_photo/<int:photoID>/", show_one_photo, name="show_photo"),

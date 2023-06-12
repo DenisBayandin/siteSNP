@@ -25,6 +25,7 @@ from .views.auth.auth import (
     profile,
     logout_view,
     update_password,
+    auth_telegram
 )
 from .views.update.update_data import update_token, update_data_profile
 from .views.notification.notification import notification_view

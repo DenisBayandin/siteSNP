@@ -27,7 +27,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", default=config("SECRET_KEY"))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "lit-refuge-13907.herokuapp.com"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "lit-refuge-13907.herokuapp.com", "rare-glasses-rule.loca.lt"]
 
 # Application definition
 
@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "cloudinary_storage",
     "cloudinary",
     "corsheaders",
+    "django_telegram_login",
 ]
 
 REST_FRAMEWORK = {
@@ -229,3 +230,9 @@ CLOUDINARY_STORAGE = {
 # Settings get CSRF_TOKEN
 
 CSRF_TRUSTED_ORIGINS = ["https://lit-refuge-13907.herokuapp.com"]
+
+# Settings telegram
+
+TELEGRAM_BOT_NAME = 'Vote_photo_SNP_bot'
+TELEGRAM_BOT_TOKEN = '6036041509:AAFgyqUgDqd5KFM6FqNr7qn4AAvP-wkshk0'
+TELEGRAM_LOGIN_REDIRECT_URL = 'http://127.0.0.1:8000/'

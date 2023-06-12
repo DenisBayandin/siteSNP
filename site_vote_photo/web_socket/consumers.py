@@ -1,5 +1,6 @@
 import json
 
+from asgiref.sync import sync_to_async
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth.models import AnonymousUser
@@ -11,6 +12,26 @@ from vote_photo.models import User, Photo, Notification  # type: ignore
 def get_user(user_id):
     try:
         return User.objects.get(id=user_id)
+    except:
+        return AnonymousUser()
+
+
+@database_sync_to_async
+def go_to_online(user_id):
+    try:
+        user = User.objects.get(id=user_id)
+        user.go_status_online()
+        user.save()
+    except:
+        return AnonymousUser()
+
+
+@database_sync_to_async
+def go_to_offline(user_id):
+    try:
+        user = User.objects.get(id=user_id)
+        user.go_status_offline()
+        user.save()
     except:
         return AnonymousUser()
 
@@ -53,6 +74,8 @@ class NotificationConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         get_pk_user_from_url = self.scope["url_route"]["kwargs"]["user_pk"]
         user_from_db = await get_user(int(get_pk_user_from_url))
+        self.copy_user = user_from_db
+        await go_to_online(user_from_db.id)
         self.group_name = user_from_db.group_name
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         await self.channel_layer.group_add("notification_admin", self.channel_name)
@@ -80,10 +103,10 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         await self.send(json.dumps({"message": new_new_data}))
 
     async def disconnect(self, event):
+        await go_to_offline(self.copy_user.id)
         await self.channel_layer.group_discard(self.group_name, self.channel_name)
         await self.channel_layer.group_discard("notification_admin", self.channel_name)
         await self.close()
 
     async def send_notification(self, event):
-        breakpoint()
         await self.send(json.dumps({"type": "websocket.send", "data": event}))

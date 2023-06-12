@@ -14,10 +14,13 @@ class ServiceRenameProfile(Service):
     user = ModelField(User)
 
     def process(self):
+        self.update_profile()
+        self.cleaned_data["user"].save()
+
+    def update_profile(self):
         user = self.cleaned_data["user"]
         user.username = self.cleaned_data["username"]
         user.first_name = self.cleaned_data["first_name"]
         user.last_name = self.cleaned_data["last_name"]
         user.patronymic = self.cleaned_data["patronymic"]
         user.email = self.cleaned_data["email"]
-        user.save()
